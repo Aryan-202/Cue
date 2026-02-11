@@ -7,4 +7,45 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Golden Black Theme -->
+    <color name="colorPrimary">#1F1F1F</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorAccent">#FFD700</color>
+    <color name="text_primary_on_dark">#FFFFFF</color>
+    <color name="text_secondary_on_dark">#B3FFFFFF</color>
+    <color name="icon_tint_on_dark">#FFFFFF</color>
+
+    <!-- Extended Golden Black Theme -->
+    <!-- Backgrounds and Surfaces -->
+    <color name="background_color">#000000</color>
+    <color name="surface_color">#121212</color>
+    <color name="card_background_color">#1E1E1E</color>
+    <color name="bottom_nav_background_color">#1F1F1F</color>
+
+    <!-- Gold Palette -->
+    <color name="gold_primary">#FFD700</color>
+    <color name="gold_dark">#B8860B</color>
+    <color name="gold_light">#FFFACD</color>
+    <color name="gold_accent">#FFC107</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B3FFFFFF</color>
+    <color name="text_tertiary">#8AFFFFFF</color>
+    <color name="text_disabled">#61FFFFFF</color>
+    <color name="text_on_gold">#000000</color>
+
+    <!-- Icon Tints -->
+    <color name="icon_active">#FFD700</color>
+    <color name="icon_inactive">#B3FFFFFF</color>
+
+    <!-- Other UI elements -->
+    <color name="divider">#29FFFFFF</color>
+    <color name="ripple_effect">#40FFD700</color>
+    <color name="notification_badge">#FFD700</color>
+
+    <!-- System Bars -->
+    <color name="status_bar">#000000</color>
+    <color name="navigation_bar">#000000</color>
 </resources>
