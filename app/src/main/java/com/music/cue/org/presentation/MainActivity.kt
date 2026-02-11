@@ -1,4 +1,4 @@
-package com.music.cue.org
+package com.music.cue.org.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
