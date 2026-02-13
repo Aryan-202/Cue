@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+
+    id("kotlin-parcelize")
 }
 
 android {
@@ -61,5 +63,7 @@ dependencies {
     implementation(libs.androidx.media3.ui)
     implementation(libs.coil.compose)
     implementation(libs.accompanist.permissions)
+
+    implementation(libs.kotlin.parcelize.runtime)
 
 }
