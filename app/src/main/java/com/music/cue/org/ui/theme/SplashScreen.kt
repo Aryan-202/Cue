@@ -37,11 +37,11 @@ fun SplashScreen(onStartClick: ()-> Unit={}){
         Button(
             onClick = onStartClick,
             modifier = Modifier
-                .padding(top=48.dp, start = 24.dp, end = 24.dp)
-                .align(alignment = Alignment.TopCenter)
+                .padding(bottom = 48.dp, end = 24.dp)
+                .align(alignment = Alignment.BottomEnd)
                 .height(50.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = colorResource(R.color.gold_dark)
+                containerColor = colorResource(R.color.blue_500)
             ),
             shape = RoundedCornerShape(25.dp)
 
