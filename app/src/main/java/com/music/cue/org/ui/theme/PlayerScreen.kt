@@ -1,10 +1,23 @@
 package com.music.cue.org.ui.theme
 
 import android.content.ContentUris
+import android.graphics.drawable.Icon
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -21,7 +34,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
@@ -124,6 +136,38 @@ fun PlayerScreen(
                 placeholder = painterResource(R.drawable.baseline_music_note_24)
 
             )
+
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 48.dp,)
+            ) {
+                IconButton(
+                    onBack,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(
+                            Color(0x30ffffff),
+                            shape = CircleShape
+                        )
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = Color.White)
+                }
+                Spacer(
+                    modifier = Modifier
+                        .weight(1f)
+                )
+                IconButton(
+                    onClick = { },
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(
+                            Color(0x30ffffff),
+                            shape = CircleShape
+                        )
+                ) {
+                    Icon(Icons.Default.FavoriteBorder, contentDescription = null, tint = Color.White)
+                }
+            }
         }
     }
 }
