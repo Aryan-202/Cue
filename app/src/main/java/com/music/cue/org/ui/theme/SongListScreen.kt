@@ -83,6 +83,14 @@ fun SongListScreen(
                     )
                 }
             }
+            SongList(
+                songs = songState.value,
+                onSongClick = {position ->
+                    onSongClick(songState.value, position)
+                },
+                modifier = Modifier
+                    .weight(1f)
+            )
         }
     }
 }
