@@ -3,12 +3,16 @@ package com.music.cue.org.ui.theme
 import android.Manifest
 import android.os.Build
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
+import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -63,24 +67,33 @@ fun SongListScreen(
             Modifier.fillMaxSize()
         ) {
             Text(
-                text = "Explorer",
-                fontSize = 20.sp,
-                color = colorResource(R.color.white),
-                fontWeight = FontWeight.Bold,
+                text = "My Music Library",
+                fontSize = 28.sp,
+                color = Color.White,
+                fontWeight = FontWeight.ExtraBold,
                 modifier = Modifier
-                    .padding(top = 44.dp, bottom = 16.dp)
-                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 60.dp, bottom = 24.dp, start = 20.dp)
             )
 
             if (!permissionState.status.isGranted) {
-                Button(
-                    onClick = {permissionState.launchPermissionRequest()},
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        "Permissions required"
+                        "We need access to your music",
+                        color = Color.White.copy(alpha = 0.7f),
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
                     )
+                    Button(
+                        onClick = { permissionState.launchPermissionRequest() },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Grant Permission", fontWeight = FontWeight.Bold)
+                    }
                 }
             }
             SongList(

@@ -36,9 +36,12 @@ fun getSongs(context: Context): List<Song> {
             val id = it.getLong(idColumn)
             val title = it.getString(titleColumn)
             val artist = it.getString(artistColumn)
-            val data = it.getString(dataColumn)
+            val contentUri = android.content.ContentUris.withAppendedId(
+                android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                id
+            ).toString()
             val albumId = it.getLong(albumIdColumn)
-            songs.add(Song(id, title, artist, data, albumId))
+            songs.add(Song(id, title, artist, contentUri, albumId))
         }
     }
     return songs
