@@ -10,24 +10,25 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.music.cue.org.R
+import com.music.cue.org.constants.ButtonSize
+
 
 @Composable
 fun PlayButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    isPlaying: Boolean = true,
-    size: ButtonSize = ButtonSize.Medium
+    isEnabled: Boolean = true,
+    size: ButtonSize = ButtonSize.MEDIUM
 ) {
     val iconSize = when (size) {
-        ButtonSize.Small -> 24.dp
-        ButtonSize.Medium -> 32.dp
-        ButtonSize.Large -> 48.dp
+        ButtonSize.SMALL -> 24.dp
+        ButtonSize.MEDIUM -> 32.dp
+        ButtonSize.LARGE -> 48.dp
     }
 
     IconButton(
         onClick = onClick,
-        enabled = enabled,
+        enabled = isEnabled,
         modifier = modifier.size(iconSize + 16.dp) // Add padding
     ) {
         Icon(
@@ -39,12 +40,13 @@ fun PlayButton(
     }
 }
 
+
+
 @Preview
 @Composable
 fun PlayButtonPreview() {
-    PlayButton(onClick = {})
+    PlayButton(
+        onClick = {}
+    )
 }
 
-enum class ButtonSize {
-    Small, Medium, Large
-}
