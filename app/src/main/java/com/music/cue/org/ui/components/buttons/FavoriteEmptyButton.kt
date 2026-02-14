@@ -13,7 +13,7 @@ import com.music.cue.org.R
 import com.music.cue.org.constants.ButtonSize
 
 @Composable
-fun PauseButton(
+fun FavoriteEmptyButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isEnabled: Boolean = true,
@@ -37,44 +37,44 @@ fun PauseButton(
         enabled = isEnabled
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.pause_circle),
-            contentDescription = "Pause",
+            painter = painterResource(id = R.drawable.favorite_empty_button),
+            contentDescription = "Add to favorites",
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(iconSize)
         )
     }
 }
 
-@Preview(name = "Pause Button - Default")
+@Preview(name = "Favorite Empty Button - Default")
 @Composable
-fun PauseButtonPreview() {
-    PauseButton(
+fun FavoriteEmptyButtonPreview() {
+    FavoriteEmptyButton(
         onClick = {}
     )
 }
 
-@Preview(name = "Pause Button - Disabled")
+@Preview(name = "Favorite Empty Button - Disabled")
 @Composable
-fun PauseButtonDisabledPreview() {
-    PauseButton(
+fun FavoriteEmptyButtonDisabledPreview() {
+    FavoriteEmptyButton(
         onClick = {},
         isEnabled = false
     )
 }
 
-@Preview(name = "Pause Button - Small")
+@Preview(name = "Favorite Empty Button - Small")
 @Composable
-fun PauseButtonSmallPreview() {
-    PauseButton(
+fun FavoriteEmptyButtonSmallPreview() {
+    FavoriteEmptyButton(
         onClick = {},
         size = ButtonSize.SMALL
     )
 }
 
-@Preview(name = "Pause Button - Large")
+@Preview(name = "Favorite Empty Button - Large")
 @Composable
-fun PauseButtonLargePreview() {
-    PauseButton(
+fun FavoriteEmptyButtonLargePreview() {
+    FavoriteEmptyButton(
         onClick = {},
         size = ButtonSize.LARGE
     )

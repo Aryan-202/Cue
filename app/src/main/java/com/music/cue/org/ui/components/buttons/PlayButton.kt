@@ -12,7 +12,6 @@ import androidx.compose.ui.unit.dp
 import com.music.cue.org.R
 import com.music.cue.org.constants.ButtonSize
 
-
 @Composable
 fun PlayButton(
     onClick: () -> Unit,
@@ -20,16 +19,24 @@ fun PlayButton(
     isEnabled: Boolean = true,
     size: ButtonSize = ButtonSize.MEDIUM
 ) {
+
+    val buttonSize = when (size) {
+        ButtonSize.SMALL -> 32.dp
+        ButtonSize.MEDIUM -> 48.dp
+        ButtonSize.LARGE -> 64.dp
+    }
+
+    // Calculate icon size based on enum
     val iconSize = when (size) {
-        ButtonSize.SMALL -> 24.dp
-        ButtonSize.MEDIUM -> 32.dp
-        ButtonSize.LARGE -> 48.dp
+        ButtonSize.SMALL -> 16.dp
+        ButtonSize.MEDIUM -> 24.dp
+        ButtonSize.LARGE -> 32.dp
     }
 
     IconButton(
         onClick = onClick,
-        enabled = isEnabled,
-        modifier = modifier.size(iconSize + 16.dp) // Add padding
+        modifier = modifier.size(buttonSize),
+        enabled = isEnabled
     ) {
         Icon(
             painter = painterResource(id = R.drawable.play_button),
@@ -40,9 +47,7 @@ fun PlayButton(
     }
 }
 
-
-
-@Preview
+@Preview(name = "Play Button - Default")
 @Composable
 fun PlayButtonPreview() {
     PlayButton(
@@ -50,3 +55,29 @@ fun PlayButtonPreview() {
     )
 }
 
+@Preview(name = "Play Button - Disabled")
+@Composable
+fun PlayButtonDisabledPreview() {
+    PlayButton(
+        onClick = {},
+        isEnabled = false
+    )
+}
+
+@Preview(name = "Play Button - Small")
+@Composable
+fun PlayButtonSmallPreview() {
+    PlayButton(
+        onClick = {},
+        size = ButtonSize.SMALL
+    )
+}
+
+@Preview(name = "Play Button - Large")
+@Composable
+fun PlayButtonLargePreview() {
+    PlayButton(
+        onClick = {},
+        size = ButtonSize.LARGE
+    )
+}
