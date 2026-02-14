@@ -65,5 +65,6 @@ dependencies {
     implementation(libs.accompanist.permissions)
 
     implementation(libs.kotlin.parcelize.runtime)
-
+    implementation(libs.coil.compose)
+    implementation(libs.coil.gif)
 }
