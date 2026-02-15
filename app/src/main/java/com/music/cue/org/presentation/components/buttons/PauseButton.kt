@@ -48,7 +48,7 @@ fun PauseButton(
 @Preview(name = "Pause Button - Default")
 @Composable
 fun PauseButtonPreview() {
-    _root_ide_package_.com.music.cue.org.presentation.components.buttons.PauseButton(
+    PauseButton(
         onClick = {}
     )
 }
@@ -56,7 +56,7 @@ fun PauseButtonPreview() {
 @Preview(name = "Pause Button - Disabled")
 @Composable
 fun PauseButtonDisabledPreview() {
-    _root_ide_package_.com.music.cue.org.presentation.components.buttons.PauseButton(
+    PauseButton(
         onClick = {},
         isEnabled = false
     )
@@ -65,7 +65,7 @@ fun PauseButtonDisabledPreview() {
 @Preview(name = "Pause Button - Small")
 @Composable
 fun PauseButtonSmallPreview() {
-    _root_ide_package_.com.music.cue.org.presentation.components.buttons.PauseButton(
+    PauseButton(
         onClick = {},
         size = ButtonSize.SMALL
     )
@@ -74,7 +74,7 @@ fun PauseButtonSmallPreview() {
 @Preview(name = "Pause Button - Large")
 @Composable
 fun PauseButtonLargePreview() {
-    _root_ide_package_.com.music.cue.org.presentation.components.buttons.PauseButton(
+    PauseButton(
         onClick = {},
         size = ButtonSize.LARGE
     )

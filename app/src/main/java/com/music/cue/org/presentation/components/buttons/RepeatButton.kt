@@ -56,7 +56,7 @@ fun RepeatButton(
 @Preview
 @Composable
 fun RepeatButtonOffPreview() {
-    _root_ide_package_.com.music.cue.org.presentation.components.buttons.RepeatButton(
+    RepeatButton(
         onClick = {},
         buttonState = RepeatButtonState.OFF
     )
@@ -65,7 +65,7 @@ fun RepeatButtonOffPreview() {
 @Preview
 @Composable
 fun RepeatButtonAllPreview() {
-    _root_ide_package_.com.music.cue.org.presentation.components.buttons.RepeatButton(
+    RepeatButton(
         onClick = {},
         buttonState = RepeatButtonState.REPEAT_ALL
     )
@@ -74,7 +74,7 @@ fun RepeatButtonAllPreview() {
 @Preview
 @Composable
 fun RepeatButtonOnePreview() {
-    _root_ide_package_.com.music.cue.org.presentation.components.buttons.RepeatButton(
+    RepeatButton(
         onClick = {},
         buttonState = RepeatButtonState.REPEAT_ONE
     )

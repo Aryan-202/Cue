@@ -48,7 +48,7 @@ fun FavoriteFilledButton(
 @Preview(name = "Favorite Filled Button - Default")
 @Composable
 fun FavoriteFilledButtonPreview() {
-    _root_ide_package_.com.music.cue.org.presentation.components.buttons.FavoriteFilledButton(
+    FavoriteFilledButton(
         onClick = {}
     )
 }
@@ -56,7 +56,7 @@ fun FavoriteFilledButtonPreview() {
 @Preview(name = "Favorite Filled Button - Disabled")
 @Composable
 fun FavoriteFilledButtonDisabledPreview() {
-    _root_ide_package_.com.music.cue.org.presentation.components.buttons.FavoriteFilledButton(
+    FavoriteFilledButton(
         onClick = {},
         isEnabled = false
     )
@@ -65,7 +65,7 @@ fun FavoriteFilledButtonDisabledPreview() {
 @Preview(name = "Favorite Filled Button - Small")
 @Composable
 fun FavoriteFilledButtonSmallPreview() {
-    _root_ide_package_.com.music.cue.org.presentation.components.buttons.FavoriteFilledButton(
+    FavoriteFilledButton(
         onClick = {},
         size = ButtonSize.SMALL
     )
@@ -74,7 +74,7 @@ fun FavoriteFilledButtonSmallPreview() {
 @Preview(name = "Favorite Filled Button - Large")
 @Composable
 fun FavoriteFilledButtonLargePreview() {
-    _root_ide_package_.com.music.cue.org.presentation.components.buttons.FavoriteFilledButton(
+    FavoriteFilledButton(
         onClick = {},
         size = ButtonSize.LARGE
     )

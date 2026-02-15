@@ -48,7 +48,7 @@ fun FavoriteEmptyButton(
 @Preview(name = "Favorite Empty Button - Default")
 @Composable
 fun FavoriteEmptyButtonPreview() {
-    _root_ide_package_.com.music.cue.org.presentation.components.buttons.FavoriteEmptyButton(
+    FavoriteEmptyButton(
         onClick = {}
     )
 }
@@ -56,7 +56,7 @@ fun FavoriteEmptyButtonPreview() {
 @Preview(name = "Favorite Empty Button - Disabled")
 @Composable
 fun FavoriteEmptyButtonDisabledPreview() {
-    _root_ide_package_.com.music.cue.org.presentation.components.buttons.FavoriteEmptyButton(
+    FavoriteEmptyButton(
         onClick = {},
         isEnabled = false
     )
@@ -65,7 +65,7 @@ fun FavoriteEmptyButtonDisabledPreview() {
 @Preview(name = "Favorite Empty Button - Small")
 @Composable
 fun FavoriteEmptyButtonSmallPreview() {
-    _root_ide_package_.com.music.cue.org.presentation.components.buttons.FavoriteEmptyButton(
+    FavoriteEmptyButton(
         onClick = {},
         size = ButtonSize.SMALL
     )
@@ -74,7 +74,7 @@ fun FavoriteEmptyButtonSmallPreview() {
 @Preview(name = "Favorite Empty Button - Large")
 @Composable
 fun FavoriteEmptyButtonLargePreview() {
-    _root_ide_package_.com.music.cue.org.presentation.components.buttons.FavoriteEmptyButton(
+    FavoriteEmptyButton(
         onClick = {},
         size = ButtonSize.LARGE
     )

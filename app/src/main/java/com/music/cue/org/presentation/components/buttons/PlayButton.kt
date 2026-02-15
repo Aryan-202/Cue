@@ -49,7 +49,7 @@ fun PlayButton(
 @Preview(name = "Play Button - Default")
 @Composable
 fun PlayButtonPreview() {
-    _root_ide_package_.com.music.cue.org.presentation.components.buttons.PlayButton(
+    PlayButton(
         onClick = {}
     )
 }
@@ -57,7 +57,7 @@ fun PlayButtonPreview() {
 @Preview(name = "Play Button - Disabled")
 @Composable
 fun PlayButtonDisabledPreview() {
-    _root_ide_package_.com.music.cue.org.presentation.components.buttons.PlayButton(
+    PlayButton(
         onClick = {},
         isEnabled = false
     )
@@ -66,7 +66,7 @@ fun PlayButtonDisabledPreview() {
 @Preview(name = "Play Button - Small")
 @Composable
 fun PlayButtonSmallPreview() {
-    _root_ide_package_.com.music.cue.org.presentation.components.buttons.PlayButton(
+    PlayButton(
         onClick = {},
         size = ButtonSize.SMALL
     )
@@ -75,7 +75,7 @@ fun PlayButtonSmallPreview() {
 @Preview(name = "Play Button - Large")
 @Composable
 fun PlayButtonLargePreview() {
-    _root_ide_package_.com.music.cue.org.presentation.components.buttons.PlayButton(
+    PlayButton(
         onClick = {},
         size = ButtonSize.LARGE
     )
