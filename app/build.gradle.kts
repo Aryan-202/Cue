@@ -74,5 +74,6 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
     implementation(libs.androidx.hilt.navigation.fragment)
     implementation(libs.androidx.hilt.work)
+    implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.compose.ui.text.google.fonts)
 }

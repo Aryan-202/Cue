@@ -13,7 +13,10 @@ class SongRepository @Inject constructor(
 ): ISongRepository {
 
     override fun getSongs(): Flow<List<Song>> = flow {
-        emit(loadSongsFromMediaStore())
+        val songs = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            loadSongsFromMediaStore()
+        }
+        emit(songs)
     }
 
     private fun loadSongsFromMediaStore(): List<Song> {
