@@ -1,10 +1,9 @@
-package com.music.cue.org.presentation
+package com.music.cue.org.v1
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.music.cue.org.theme.SplashScreen
 
 class SplashActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

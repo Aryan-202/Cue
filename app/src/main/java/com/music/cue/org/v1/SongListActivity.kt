@@ -1,4 +1,4 @@
-package com.music.cue.org.presentation
+package com.music.cue.org.v1
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,7 +6,6 @@ import java.util.ArrayList
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.music.cue.org.theme.SongListScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

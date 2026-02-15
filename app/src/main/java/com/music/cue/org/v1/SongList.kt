@@ -1,4 +1,4 @@
-package com.music.cue.org.theme
+package com.music.cue.org.v1
 
 import android.content.ContentUris
 import android.net.Uri
@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.music.cue.org.R
-import com.music.cue.org.v1.Song
 
 
 @Composable

@@ -1,4 +1,4 @@
-package com.music.cue.org.theme
+package com.music.cue.org.v1
 
 import android.content.ContentUris
 import androidx.compose.foundation.background
@@ -44,7 +44,6 @@ import androidx.media3.exoplayer.ExoPlayer
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import com.music.cue.org.R
-import com.music.cue.org.v1.Song
 import java.util.Locale
 import kotlinx.coroutines.delay
 
