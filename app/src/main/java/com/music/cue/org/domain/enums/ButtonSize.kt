@@ -1,4 +1,4 @@
-package com.music.cue.org.core.constants
+package com.music.cue.org.domain.enums
 
 enum class ButtonSize {
     SMALL, MEDIUM, LARGE

@@ -10,15 +10,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.music.cue.org.R
-import com.music.cue.org.core.constants.ButtonSize
-import com.music.cue.org.core.constants.RepeatButtonState
+import com.music.cue.org.domain.enums.ButtonSize
+import com.music.cue.org.domain.enums.RepeatMode
 
 @Composable
 fun RepeatButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: ButtonSize = ButtonSize.MEDIUM,
-    buttonState: RepeatButtonState = RepeatButtonState.OFF
+    buttonMode: RepeatMode = RepeatMode.OFF,
 ) {
 
     val iconSize = when (size) {
@@ -27,10 +27,10 @@ fun RepeatButton(
         ButtonSize.LARGE -> 32.dp
     }
 
-    val iconState = when (buttonState) {
-        RepeatButtonState.OFF -> painterResource(id = R.drawable.repeat_off_button)
-        RepeatButtonState.REPEAT_ALL -> painterResource(id = R.drawable.repeat_on_button)
-        RepeatButtonState.REPEAT_ONE -> painterResource(id = R.drawable.repeat_one_button)
+    val iconState = when (buttonMode) {
+        RepeatMode.OFF -> painterResource(id = R.drawable.repeat_off_button)
+        RepeatMode.REPEAT_ALL -> painterResource(id = R.drawable.repeat_on_button)
+        RepeatMode.REPEAT_ONE -> painterResource(id = R.drawable.repeat_one_button)
     }
 
     val buttonSize = when (size) {
@@ -58,7 +58,7 @@ fun RepeatButton(
 fun RepeatButtonOffPreview() {
     RepeatButton(
         onClick = {},
-        buttonState = RepeatButtonState.OFF
+        buttonMode = RepeatMode.OFF
     )
 }
 
@@ -67,7 +67,7 @@ fun RepeatButtonOffPreview() {
 fun RepeatButtonAllPreview() {
     RepeatButton(
         onClick = {},
-        buttonState = RepeatButtonState.REPEAT_ALL
+        buttonMode = RepeatMode.REPEAT_ALL
     )
 }
 
@@ -76,6 +76,6 @@ fun RepeatButtonAllPreview() {
 fun RepeatButtonOnePreview() {
     RepeatButton(
         onClick = {},
-        buttonState = RepeatButtonState.REPEAT_ONE
+        buttonMode = RepeatMode.REPEAT_ONE
     )
 }
