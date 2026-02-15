@@ -5,7 +5,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.music.cue.org.data.Song
-import com.music.cue.org.ui.theme.PlayerScreen
+import com.music.cue.org.theme.PlayerScreen
 
 class PlayerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,4 +1,4 @@
-package com.music.cue.org.ui.theme
+package com.music.cue.org.theme
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box

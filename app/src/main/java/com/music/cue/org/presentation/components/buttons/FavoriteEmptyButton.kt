@@ -1,4 +1,4 @@
-package com.music.cue.org.ui.components.buttons
+package com.music.cue.org.presentation.components.buttons
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -13,7 +13,7 @@ import com.music.cue.org.R
 import com.music.cue.org.constants.ButtonSize
 
 @Composable
-fun FavoriteFilledButton(
+fun FavoriteEmptyButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isEnabled: Boolean = true,
@@ -37,44 +37,44 @@ fun FavoriteFilledButton(
         enabled = isEnabled
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.favorite_filled_button),
-            contentDescription = "Remove from favorites",
+            painter = painterResource(id = R.drawable.favorite_empty_button),
+            contentDescription = "Add to favorites",
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(iconSize)
         )
     }
 }
 
-@Preview(name = "Favorite Filled Button - Default")
+@Preview(name = "Favorite Empty Button - Default")
 @Composable
-fun FavoriteFilledButtonPreview() {
-    FavoriteFilledButton(
+fun FavoriteEmptyButtonPreview() {
+    _root_ide_package_.com.music.cue.org.presentation.components.buttons.FavoriteEmptyButton(
         onClick = {}
     )
 }
 
-@Preview(name = "Favorite Filled Button - Disabled")
+@Preview(name = "Favorite Empty Button - Disabled")
 @Composable
-fun FavoriteFilledButtonDisabledPreview() {
-    FavoriteFilledButton(
+fun FavoriteEmptyButtonDisabledPreview() {
+    _root_ide_package_.com.music.cue.org.presentation.components.buttons.FavoriteEmptyButton(
         onClick = {},
         isEnabled = false
     )
 }
 
-@Preview(name = "Favorite Filled Button - Small")
+@Preview(name = "Favorite Empty Button - Small")
 @Composable
-fun FavoriteFilledButtonSmallPreview() {
-    FavoriteFilledButton(
+fun FavoriteEmptyButtonSmallPreview() {
+    _root_ide_package_.com.music.cue.org.presentation.components.buttons.FavoriteEmptyButton(
         onClick = {},
         size = ButtonSize.SMALL
     )
 }
 
-@Preview(name = "Favorite Filled Button - Large")
+@Preview(name = "Favorite Empty Button - Large")
 @Composable
-fun FavoriteFilledButtonLargePreview() {
-    FavoriteFilledButton(
+fun FavoriteEmptyButtonLargePreview() {
+    _root_ide_package_.com.music.cue.org.presentation.components.buttons.FavoriteEmptyButton(
         onClick = {},
         size = ButtonSize.LARGE
     )

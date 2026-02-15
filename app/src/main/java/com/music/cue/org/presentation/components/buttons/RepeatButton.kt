@@ -1,4 +1,4 @@
-package com.music.cue.org.ui.components.buttons
+package com.music.cue.org.presentation.components.buttons
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -56,7 +56,7 @@ fun RepeatButton(
 @Preview
 @Composable
 fun RepeatButtonOffPreview() {
-    RepeatButton(
+    _root_ide_package_.com.music.cue.org.presentation.components.buttons.RepeatButton(
         onClick = {},
         buttonState = RepeatButtonState.OFF
     )
@@ -65,7 +65,7 @@ fun RepeatButtonOffPreview() {
 @Preview
 @Composable
 fun RepeatButtonAllPreview() {
-    RepeatButton(
+    _root_ide_package_.com.music.cue.org.presentation.components.buttons.RepeatButton(
         onClick = {},
         buttonState = RepeatButtonState.REPEAT_ALL
     )
@@ -74,7 +74,7 @@ fun RepeatButtonAllPreview() {
 @Preview
 @Composable
 fun RepeatButtonOnePreview() {
-    RepeatButton(
+    _root_ide_package_.com.music.cue.org.presentation.components.buttons.RepeatButton(
         onClick = {},
         buttonState = RepeatButtonState.REPEAT_ONE
     )

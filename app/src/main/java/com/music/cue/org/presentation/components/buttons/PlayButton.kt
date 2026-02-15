@@ -1,4 +1,4 @@
-package com.music.cue.org.ui.components.buttons
+package com.music.cue.org.presentation.components.buttons
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -13,12 +13,13 @@ import com.music.cue.org.R
 import com.music.cue.org.constants.ButtonSize
 
 @Composable
-fun PauseButton(
+fun PlayButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isEnabled: Boolean = true,
     size: ButtonSize = ButtonSize.MEDIUM
 ) {
+
     val buttonSize = when (size) {
         ButtonSize.SMALL -> 32.dp
         ButtonSize.MEDIUM -> 48.dp
@@ -37,44 +38,44 @@ fun PauseButton(
         enabled = isEnabled
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.pause_circle),
-            contentDescription = "Pause",
+            painter = painterResource(id = R.drawable.play_button),
+            contentDescription = "Play",
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(iconSize)
         )
     }
 }
 
-@Preview(name = "Pause Button - Default")
+@Preview(name = "Play Button - Default")
 @Composable
-fun PauseButtonPreview() {
-    PauseButton(
+fun PlayButtonPreview() {
+    _root_ide_package_.com.music.cue.org.presentation.components.buttons.PlayButton(
         onClick = {}
     )
 }
 
-@Preview(name = "Pause Button - Disabled")
+@Preview(name = "Play Button - Disabled")
 @Composable
-fun PauseButtonDisabledPreview() {
-    PauseButton(
+fun PlayButtonDisabledPreview() {
+    _root_ide_package_.com.music.cue.org.presentation.components.buttons.PlayButton(
         onClick = {},
         isEnabled = false
     )
 }
 
-@Preview(name = "Pause Button - Small")
+@Preview(name = "Play Button - Small")
 @Composable
-fun PauseButtonSmallPreview() {
-    PauseButton(
+fun PlayButtonSmallPreview() {
+    _root_ide_package_.com.music.cue.org.presentation.components.buttons.PlayButton(
         onClick = {},
         size = ButtonSize.SMALL
     )
 }
 
-@Preview(name = "Pause Button - Large")
+@Preview(name = "Play Button - Large")
 @Composable
-fun PauseButtonLargePreview() {
-    PauseButton(
+fun PlayButtonLargePreview() {
+    _root_ide_package_.com.music.cue.org.presentation.components.buttons.PlayButton(
         onClick = {},
         size = ButtonSize.LARGE
     )
