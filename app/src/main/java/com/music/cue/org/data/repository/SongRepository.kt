@@ -1,18 +1,18 @@
-package com.music.cue.org.domain.repository
+package com.music.cue.org.data.repository
 
 import android.content.Context
 import android.provider.MediaStore
 import com.music.cue.org.domain.model.Song
+import com.music.cue.org.domain.repository.ISongRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
-
 
 class SongRepository @Inject constructor(
     private val context: Context
 ): ISongRepository {
 
-    override fun getSongs(): Flow<List<Song>> = flow{
+    override fun getSongs(): Flow<List<Song>> = flow {
         emit(loadSongsFromMediaStore())
     }
 

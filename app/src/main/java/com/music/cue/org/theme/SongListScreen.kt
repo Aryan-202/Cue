@@ -29,8 +29,8 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.music.cue.org.R
-import com.music.cue.org.data.Song
-import com.music.cue.org.data.getSongs
+import com.music.cue.org.v1.Song
+import com.music.cue.org.v1.getSongs
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable

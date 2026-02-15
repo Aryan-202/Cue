@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.music.cue.org.R
-import com.music.cue.org.data.Song
+import com.music.cue.org.v1.Song
 
 
 @Composable
