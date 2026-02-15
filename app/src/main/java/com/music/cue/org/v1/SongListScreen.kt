@@ -1,4 +1,4 @@
-package com.music.cue.org.theme
+package com.music.cue.org.v1
 
 import android.Manifest
 import android.os.Build
@@ -29,8 +29,6 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.music.cue.org.R
-import com.music.cue.org.data.Song
-import com.music.cue.org.data.getSongs
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable

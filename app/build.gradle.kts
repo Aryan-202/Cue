@@ -69,6 +69,9 @@ dependencies {
     implementation(libs.kotlin.parcelize.runtime)
     implementation(libs.coil.compose)
     implementation(libs.coil.gif)
-    implementation(libs.hilt.android.v2571)
-    ksp(libs.hilt.android.compiler)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.navigation.fragment)
+    implementation(libs.androidx.hilt.work)
 }

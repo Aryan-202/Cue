@@ -10,7 +10,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.music.cue.org.R
-import com.music.cue.org.constants.ButtonSize
+import com.music.cue.org.core.constants.ButtonSize
 
 @Composable
 fun PauseButton(

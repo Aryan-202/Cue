@@ -1,5 +1,6 @@
-package com.music.cue.org.data
+package com.music.cue.org.v1
 
+import android.content.ContentUris
 import android.content.Context
 import android.provider.MediaStore
 
@@ -36,8 +37,8 @@ fun getSongs(context: Context): List<Song> {
             val id = it.getLong(idColumn)
             val title = it.getString(titleColumn)
             val artist = it.getString(artistColumn)
-            val contentUri = android.content.ContentUris.withAppendedId(
-                android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+            val contentUri = ContentUris.withAppendedId(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 id
             ).toString()
             val albumId = it.getLong(albumIdColumn)

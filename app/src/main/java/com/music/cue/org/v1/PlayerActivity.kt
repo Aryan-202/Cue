@@ -1,11 +1,9 @@
-package com.music.cue.org.presentation
+package com.music.cue.org.v1
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import com.music.cue.org.data.Song
-import com.music.cue.org.theme.PlayerScreen
 
 class PlayerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

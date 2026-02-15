@@ -1,4 +1,4 @@
-package com.music.cue.org.data
+package com.music.cue.org.v1
 
 import android.os.Parcel
 import android.os.Parcelable
