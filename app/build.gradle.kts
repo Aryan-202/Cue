@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 
     id("kotlin-parcelize")
+    id("com.google.dagger.hilt.android") version "2.59.1"
+    id("com.google.devtools.ksp") version "2.3.5"
 }
 
 android {
@@ -67,4 +69,6 @@ dependencies {
     implementation(libs.kotlin.parcelize.runtime)
     implementation(libs.coil.compose)
     implementation(libs.coil.gif)
+    implementation(libs.hilt.android.v2571)
+    ksp(libs.hilt.android.compiler)
 }
