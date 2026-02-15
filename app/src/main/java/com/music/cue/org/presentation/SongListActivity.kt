@@ -6,7 +6,7 @@ import java.util.ArrayList
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.music.cue.org.ui.theme.SongListScreen
+import com.music.cue.org.theme.SongListScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

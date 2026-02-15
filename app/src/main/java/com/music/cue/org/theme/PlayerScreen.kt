@@ -1,4 +1,4 @@
-package com.music.cue.org.ui.theme
+package com.music.cue.org.theme
 
 import android.content.ContentUris
 import androidx.compose.foundation.background
