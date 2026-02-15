@@ -55,8 +55,27 @@ fun RepeatButton(
 
 @Preview
 @Composable
-fun RepeatButtonDisabledPreview() {
+fun RepeatButtonOffPreview() {
     RepeatButton(
-        onClick = {}
+        onClick = {},
+        buttonState = RepeatButtonState.OFF
+    )
+}
+
+@Preview
+@Composable
+fun RepeatButtonAllPreview() {
+    RepeatButton(
+        onClick = {},
+        buttonState = RepeatButtonState.REPEAT_ALL
+    )
+}
+
+@Preview
+@Composable
+fun RepeatButtonOnePreview() {
+    RepeatButton(
+        onClick = {},
+        buttonState = RepeatButtonState.REPEAT_ONE
     )
 }
