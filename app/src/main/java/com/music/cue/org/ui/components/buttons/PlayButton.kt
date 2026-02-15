@@ -26,7 +26,6 @@ fun PlayButton(
         ButtonSize.LARGE -> 64.dp
     }
 
-    // Calculate icon size based on enum
     val iconSize = when (size) {
         ButtonSize.SMALL -> 16.dp
         ButtonSize.MEDIUM -> 24.dp
