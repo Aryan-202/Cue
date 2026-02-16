@@ -2,63 +2,82 @@ package com.music.cue.org.theme
 
 import androidx.compose.ui.graphics.Color
 
+/**
+ * Centralized color palette for the Cue music player
+ * All colors are defined here for easy maintenance and theming
+ */
+object CueColors {
+    // Primary Blue Palette
+    val BluePrimary = Color(0xFF1976D2)      // Main blue
+    val BlueLight = Color(0xFF63A4FF)         // Light blue
+    val BlueDark = Color(0xFF004BA0)           // Dark blue
+    val BlueAccent = Color(0xFF82B1FF)         // Accent blue
+    val BlueSoft = Color(0xFFE3F2FD)           // Soft blue background
+    val BlueTransparent = Color(0x801976D2)    // Transparent blue
 
-val md_theme_light_primary = Color(0xFF00b59a)
-val md_theme_light_onPrimary = Color(0xFFFFFFFF)
-val md_theme_light_primaryContainer = Color(0xFF45FDDA)
-val md_theme_light_onPrimaryContainer = Color(0xFF00201A)
-val md_theme_light_secondary = Color(0xFF4B635C)
-val md_theme_light_onSecondary = Color(0xFFFFFFFF)
-val md_theme_light_secondaryContainer = Color(0xFFCDE8DF)
-val md_theme_light_onSecondaryContainer = Color(0xFF06201A)
-val md_theme_light_tertiary = Color(0xFF436278)
-val md_theme_light_onTertiary = Color(0xFFFFFFFF)
-val md_theme_light_tertiaryContainer = Color(0xFFC8E7FF)
-val md_theme_light_onTertiaryContainer = Color(0xFF001E2E)
-val md_theme_light_error = Color(0xFFBA1A1A)
-val md_theme_light_errorContainer = Color(0xFFFFDAD6)
-val md_theme_light_onError = Color(0xFFFFFFFF)
-val md_theme_light_onErrorContainer = Color(0xFF410002)
-val md_theme_light_background = Color(0xFFFAFDFA)
-val md_theme_light_onBackground = Color(0xFF191C1B)
-val md_theme_light_surface = Color(0xFFFAFDFA)
-val md_theme_light_onSurface = Color(0xFF191C1B)
-val md_theme_light_surfaceVariant = Color(0xFFe5fff6)
-val md_theme_light_onSurfaceVariant = Color(0xFF3F4946)
-val md_theme_light_outline = Color(0xFF6F7975)
-val md_theme_light_inverseOnSurface = Color(0xFFEFF1EF)
-val md_theme_light_inverseSurface = Color(0xFF2E3130)
-val md_theme_light_inversePrimary = Color(0xFF00DFBF)
-val md_theme_light_surfaceTint = Color(0xFF006B5A)
-val md_theme_light_outlineVariant = Color(0xFFBFC9C4)
-val md_theme_light_scrim = Color(0xFF000000)
+    // Secondary Colors
+    val CyanAccent = Color(0xFF00BCD4)          // Cyan for highlights
+    val TealAccent = Color(0xFF1DE9B6)          // Teal for secondary actions
 
-val md_theme_dark_primary = Color(0xFF00DFBF)
-val md_theme_dark_onPrimary = Color(0xFF00382E)
-val md_theme_dark_primaryContainer = Color(0xFF005144)
-val md_theme_dark_onPrimaryContainer = Color(0xFF45FDDA)
-val md_theme_dark_secondary = Color(0xFFB1CCC4)
-val md_theme_dark_onSecondary = Color(0xFF1D352F)
-val md_theme_dark_secondaryContainer = Color(0xFF334B45)
-val md_theme_dark_onSecondaryContainer = Color(0xFFCDE8DF)
-val md_theme_dark_tertiary = Color(0xFFAACBE4)
-val md_theme_dark_onTertiary = Color(0xFF113447)
-val md_theme_dark_tertiaryContainer = Color(0xFF2A4A5F)
-val md_theme_dark_onTertiaryContainer = Color(0xFFC8E7FF)
-val md_theme_dark_error = Color(0xFFFFB4AB)
-val md_theme_dark_errorContainer = Color(0xFF93000A)
-val md_theme_dark_onError = Color(0xFF690005)
-val md_theme_dark_onErrorContainer = Color(0xFFFFDAD6)
-val md_theme_dark_background = Color(0xFF191C1B)
-val md_theme_dark_onBackground = Color(0xFFE0E3E0)
-val md_theme_dark_surface = Color(0xFF191C1B)
-val md_theme_dark_onSurface = Color(0xFFE0E3E0)
-val md_theme_dark_surfaceVariant = Color(0xFF3F4946)
-val md_theme_dark_onSurfaceVariant = Color(0xFFBFC9C4)
-val md_theme_dark_outline = Color(0xFF89938F)
-val md_theme_dark_inverseOnSurface = Color(0xFF191C1B)
-val md_theme_dark_inverseSurface = Color(0xFFE0E3E0)
-val md_theme_dark_inversePrimary = Color(0xFF006B5A)
-val md_theme_dark_surfaceTint = Color(0xFF00DFBF)
-val md_theme_dark_outlineVariant = Color(0xFF3F4946)
-val md_theme_dark_scrim = Color(0xFF000000)
+    // Neutral Colors
+    val White = Color(0xFFFFFFFF)
+    val OffWhite = Color(0xFFF5F5F5)
+    val LightGray = Color(0xFFE0E0E0)
+    val MediumGray = Color(0xFF9E9E9E)
+    val DarkGray = Color(0xFF616161)
+    val Black = Color(0xFF212121)
+
+    // Semantic Colors
+    val Success = Color(0xFF4CAF50)              // Green
+    val Warning = Color(0xFFFFC107)               // Amber
+    val Error = Color(0xFFD32F2F)                  // Red
+    val Info = BlueLight                           // Info uses blue
+
+    // Player Specific Colors
+    val PlayerBackground = BlueDark
+    val PlayerControls = White
+    val PlayerProgress = BlueLight
+    val PlayerSecondaryControls = LightGray
+
+    // Favorite Colors
+    val FavoriteActive = Color(0xFFFF4081)        // Pink for active favorite
+    val FavoriteInactive = LightGray
+
+    // Gradient Colors
+    val GradientStart = BluePrimary
+    val GradientEnd = BlueDark
+
+    // Overlay Colors
+    val ScrimBackground = Color(0x99000000)       // Semi-transparent black
+    val OverlayLight = Color(0x33FFFFFF)           // Semi-transparent white
+}
+
+/**
+ * Dark theme colors derived from blue palette
+ */
+object CueDarkColors {
+    // Dark Theme Primary
+    val BluePrimary = Color(0xFF42A5F5)           // Lighter blue for dark theme
+    val BlueLight = Color(0xFF80D8FF)              // Very light blue
+    val BlueDark = Color(0xFF1565C0)               // Dark blue base
+    val BlueAccent = Color(0xFF90CAF9)              // Light accent
+
+    // Dark Theme Backgrounds
+    val Background = Color(0xFF121212)              // Material dark background
+    val Surface = Color(0xFF1E1E1E)                  // Surface color
+    val SurfaceVariant = Color(0xFF2D2D2D)           // Variant surface
+
+    // Dark Theme Text
+    val TextPrimary = Color(0xFFFFFFFF)
+    val TextSecondary = Color(0xB3FFFFFF)            // 70% white
+    val TextTertiary = Color(0x80FFFFFF)             // 50% white
+
+    // Dark Theme Player
+    val PlayerBackground = Color(0xFF0D0D0D)
+    val PlayerControls = Color(0xDEFFFFFF)
+
+    // Semantic Colors for Dark Theme
+    val Success = Color(0xFF81C784)
+    val Warning = Color(0xFFFFD54F)
+    val Error = Color(0xFFE57373)
+}
