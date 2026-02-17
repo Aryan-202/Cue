@@ -6,7 +6,7 @@ import androidx.compose.ui.unit.sp
 /**
  * Centralized dimensions for consistent spacing and sizing
  * Follows 8dp grid system for scalability
- */
+ **/
 object CueDimens {
 
     // Base Grid Unit (8dp)
@@ -103,9 +103,9 @@ object CueDimens {
     val list_divider_thickness = 1.dp
 
     // Grid Layouts
-    val grid_columns_small = 2
-    val grid_columns_medium = 3
-    val grid_columns_large = 4
+    val grid_columns_small = 2.dp
+    val grid_columns_medium = 3.dp
+    val grid_columns_large = 4.dp
     val grid_item_spacing = 8.dp
 }
 

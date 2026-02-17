@@ -209,7 +209,7 @@ object CueTypography {
 
 /**
  * Material 3 Typography implementation
- */
+ **/
 val CueMaterialTypography = Typography(
     displayLarge = CueTypography.displayLarge,
     displayMedium = CueTypography.displayMedium,
