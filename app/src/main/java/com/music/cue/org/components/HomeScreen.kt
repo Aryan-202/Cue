@@ -4,6 +4,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,6 +32,13 @@ fun HomeScreen(
             modifier = modifier
                 .padding(top = 5.dp)
         )
+        LazyHorizontalGrid(
+            rows = GridCells.Fixed(2),
+            modifier = modifier
+                .padding(top = 5.dp)
+        ) {
+
+        }
     }
 }
 
