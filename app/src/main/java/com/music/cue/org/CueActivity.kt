@@ -1,48 +1,24 @@
 package com.music.cue.org
 
-import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.music.cue.org.components.PermissionHandler
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.music.cue.org.presentation.screens.songlist.SongListScreen
 import com.music.cue.org.presentation.screens.home.HomeScreen
-import com.music.cue.org.presentation.viewmodel.PermissionViewModel
+import com.music.cue.org.presentation.viewmodel.MusicPlayerViewModel
 import com.music.cue.org.theme.CueTheme
-import com.music.cue.org.util.PermissionManager
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
-@AndroidEntryPoint
 class CueActivity : ComponentActivity() {
-
-    @Inject
-    lateinit var permissionManager: PermissionManager
-
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        permissionManager.onPermissionResult(
-            permissions.keys.toTypedArray(),
-            permissions.values.map { granted ->
-                if (granted) PackageManager.PERMISSION_GRANTED else PackageManager.PERMISSION_DENIED
-            }.toIntArray()
-        )
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -52,57 +28,98 @@ class CueActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val permissionViewModel: PermissionViewModel = viewModel()
-                    val permissionState by permissionViewModel.permissionState.collectAsState()
-                    var showMainContent by remember { mutableStateOf(false) }
-
-                    // Handle permission state
-                    LaunchedEffect(permissionState) {
-                        when (permissionState) {
-                            is PermissionViewModel.PermissionState.Granted -> {
-                                showMainContent = true
-                            }
-                            else -> {
-                                showMainContent = false
-                            }
-                        }
-                    }
-
-                    if (!showMainContent) {
-                        PermissionHandler(
-                            onPermissionsGranted = {
-                                showMainContent = true
-                            },
-                            permissionManager = permissionManager
-                        )
-                    } else {
-                        MainContent()
-                    }
+                    CueApp()
                 }
             }
         }
     }
+}
 
-    @Composable
-    fun MainContent() {
+@Composable
+fun CueApp() {
+    val navController = rememberNavController()
+    val viewModel: MusicPlayerViewModel = viewModel()
 
-
-        androidx.compose.material3.Scaffold(
-
-        ) { paddingValues ->
+    NavHost(
+        navController = navController,
+        startDestination = "home"
+    ) {
+        composable("home") {
             HomeScreen(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                onSongClick = {
-                },
-                onGenreClick = { genreId ->
-                    // Navigate to genre songs screen
-                },
-                onSearchClick = {
-                    // Navigate to search screen
-                }
+                navController = navController,
+                viewModel = viewModel
             )
+        }
+
+        composable("song_list/{type}") { backStackEntry ->
+            val type = backStackEntry.arguments?.getString("type") ?: "all"
+            val songs = when (type) {
+                "all" -> viewModel.songs.collectAsState().value
+                "favorites" -> viewModel.favoriteSongs.collectAsState().value
+                "recent" -> viewModel.recentlyPlayed.collectAsState().value
+                else -> viewModel.songs.collectAsState().value
+            }
+            val title = when (type) {
+                "all" -> "All Songs"
+                "favorites" -> "Favorites"
+                "recent" -> "Recently Played"
+                else -> "Songs"
+            }
+            SongListScreen(
+                navController = navController,
+                title = title,
+                songs = songs,
+                viewModel = viewModel
+            )
+        }
+
+        composable("album_list") {
+            // TODO: Implement AlbumListScreen
+        }
+
+        composable("artist_list") {
+            // TODO: Implement ArtistListScreen
+        }
+
+        composable("playlist_list") {
+            // TODO: Implement PlaylistListScreen
+        }
+
+        composable("favorite_list") {
+            SongListScreen(
+                navController = navController,
+                title = "Favorites",
+                songs = viewModel.favoriteSongs.collectAsState().value,
+                viewModel = viewModel
+            )
+        }
+
+        composable("recent_list") {
+            SongListScreen(
+                navController = navController,
+                title = "Recently Played",
+                songs = viewModel.recentlyPlayed.collectAsState().value,
+                viewModel = viewModel
+            )
+        }
+
+        composable("search/{query}") { backStackEntry ->
+            val query = backStackEntry.arguments?.getString("query") ?: ""
+            val allSongs = viewModel.songs.collectAsState().value
+            val searchResults = allSongs.filter {
+                it.title.contains(query, ignoreCase = true) ||
+                        it.artist.contains(query, ignoreCase = true)
+            }
+            SongListScreen(
+                navController = navController,
+                title = "Search: $query",
+                songs = searchResults,
+                viewModel = viewModel
+            )
+        }
+
+        composable("now_playing") {
+            // TODO: Implement NowPlayingScreen
         }
     }
 }

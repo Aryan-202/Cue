@@ -1,344 +1,220 @@
 package com.music.cue.org.presentation.screens.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModelStoreOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.music.cue.org.presentation.components.EmptyState
-import com.music.cue.org.presentation.components.ErrorState
-import com.music.cue.org.presentation.components.GenreCard
-import com.music.cue.org.presentation.components.HorizontalSongCard
-import com.music.cue.org.presentation.components.SearchBar
-import com.music.cue.org.presentation.components.SectionHeader
-import com.music.cue.org.presentation.components.VerticalSongCard
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.music.cue.org.R
+import com.music.cue.org.components.SearchBar
+import com.music.cue.org.presentation.components.CategoryButton
+import com.music.cue.org.presentation.viewmodel.MusicPlayerViewModel
 import com.music.cue.org.theme.CueColors
 import com.music.cue.org.theme.CueShapes
+import com.music.cue.org.theme.CueTheme
+
+data class CategoryItem(
+    val id: String,
+    val title: String,
+    val iconRes: Int,
+    val route: String,
+    val color: Color
+)
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = viewModel(
-        checkNotNull<ViewModelStoreOwner>(
-            LocalViewModelStoreOwner.current
-        ) {
-                "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
-            }, null
-    ),
-    onSongClick: (Long) -> Unit = {},
-    onGenreClick: (Long) -> Unit = {},
-    onSearchClick: () -> Unit = {}
+    navController: NavController,
+    viewModel: MusicPlayerViewModel = viewModel()
 ) {
-    val mostPlayedState by viewModel.mostPlayedSongs.collectAsStateWithLifecycle()
-    val genresState by viewModel.genres.collectAsStateWithLifecycle()
-    val recentlyPlayedState by viewModel.recentlyPlayed.collectAsStateWithLifecycle()
-    val recommendedState by viewModel.recommendedForYou.collectAsStateWithLifecycle()
-    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+    val currentSong by viewModel.currentSong.collectAsState()
+    val songs by viewModel.songs.collectAsState()
+    val albums by viewModel.albums.collectAsState()
+    val artists by viewModel.artists.collectAsState()
+    val playlists by viewModel.playlists.collectAsState()
+    val favoriteSongs by viewModel.favoriteSongs.collectAsState()
+
+    val categories = listOf(
+        CategoryItem(
+            id = "songs",
+            title = "Songs",
+            iconRes = R.drawable.ic_launcher_background,
+            route = "song_list/all",
+            color = CueColors.BluePrimary
+        ),
+        CategoryItem(
+            id = "albums",
+            title = "Albums",
+            iconRes = R.drawable.ic_launcher_background, // Replace with album icon if available
+            route = "album_list",
+            color = CueColors.CyanAccent
+        ),
+        CategoryItem(
+            id = "artists",
+            title = "Artists",
+            iconRes = R.drawable.ic_launcher_background, // Replace with artist icon
+            route = "artist_list",
+            color = CueColors.TealAccent
+        ),
+        CategoryItem(
+            id = "playlists",
+            title = "Playlists",
+            iconRes = R.drawable.ic_launcher_background, // Replace with playlist icon
+            route = "playlist_list",
+            color = CueColors.Success
+        ),
+        CategoryItem(
+            id = "favorites",
+            title = "Favorites",
+            iconRes = R.drawable.favorite_filled_button,
+            route = "favorite_list",
+            color = CueColors.FavoriteActive
+        ),
+        CategoryItem(
+            id = "recent",
+            title = "Recent",
+            iconRes = R.drawable.play_button, // Replace with recent icon
+            route = "recent_list",
+            color = CueColors.BlueAccent
+        )
+    )
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // Header with greeting
-        Box(
+        // Top Bar with App Name and Settings
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(100.dp)
-                .background(
-                    brush = androidx.compose.ui.graphics.Brush.verticalGradient(
-                        colors = listOf(
-                            CueColors.BluePrimary.copy(alpha = 0.1f),
-                            Color.Transparent
-                        )
-                    )
-                )
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = "Good evening,",
-                    color = CueColors.MediumGray,
-                    fontSize = 14.sp
-                )
-                Text(
-                    text = "Music Lover",
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
+            Text(
+                text = "Cue",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = CueColors.BluePrimary
+            )
+
+            IconButton(onClick = { /* Navigate to settings */ }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.more_horizontal_filled_button),
+                    contentDescription = "Settings",
+                    tint = CueColors.BluePrimary,
+                    modifier = Modifier.size(24.dp)
                 )
             }
         }
 
-        // Main Content
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1f),
-            contentPadding = PaddingValues(bottom = 16.dp)
-        ) {
-            // Most Played Section
-            item {
-                SectionHeader(
-                    title = "Most Played",
-                    onSeeAllClick = { viewModel.onSeeAllClick("most_played") }
-                )
-            }
-
-            item {
-                when (val state = mostPlayedState) {
-                    is HomeUiState.Loading -> {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = CueColors.BluePrimary)
-                        }
-                    }
-                    is HomeUiState.Success -> {
-                        LazyRow(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            items(state.data) { song ->
-                                HorizontalSongCard(
-                                    song = song,
-                                    onClick = { viewModel.onSongClick(song) }
-                                )
-                            }
-                        }
-                    }
-                    is HomeUiState.Error -> {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "Error loading songs",
-                                color = CueColors.Error
-                            )
-                        }
-                    }
-                }
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            // Genres Section
-            item {
-                SectionHeader(
-                    title = "Browse Genres",
-                    onSeeAllClick = { viewModel.onSeeAllClick("genres") }
-                )
-            }
-
-            item {
-                when (val state = genresState) {
-                    is HomeUiState.Loading -> {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(150.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = CueColors.BluePrimary)
-                        }
-                    }
-                    is HomeUiState.Success -> {
-                        LazyRow(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            items(state.data) { genre ->
-                                GenreCard(
-                                    genre = genre,
-                                    onClick = { viewModel.onGenreClick(genre) },
-                                    modifier = Modifier.width(120.dp)
-                                )
-                            }
-                        }
-                    }
-                    is HomeUiState.Error -> {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(150.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "Error loading genres",
-                                color = CueColors.Error
-                            )
-                        }
-                    }
-                }
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            // Recently Played Section
-            item {
-                SectionHeader(
-                    title = "Recently Played",
-                    onSeeAllClick = { viewModel.onSeeAllClick("recently_played") }
-                )
-            }
-
-            item {
-                when (val state = recentlyPlayedState) {
-                    is HomeUiState.Loading -> {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = CueColors.BluePrimary)
-                        }
-                    }
-                    is HomeUiState.Success -> {
-                        if (state.data.isEmpty()) {
-                            EmptyState(
-                                message = "No recently played songs",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp)
-                                    .padding(16.dp)
-                            )
-                        } else {
-                            LazyRow(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                items(state.data) { song ->
-                                    HorizontalSongCard(
-                                        song = song,
-                                        onClick = { viewModel.onSongClick(song) }
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    is HomeUiState.Error -> {
-                        ErrorState(
-                            message = state.message,
-                            onRetry = { /* Retry loading */ },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                                .padding(16.dp)
-                        )
-                    }
-                }
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            // Recommended For You Section
-            item {
-                SectionHeader(
-                    title = "Recommended For You",
-                    onSeeAllClick = { viewModel.onSeeAllClick("recommended") }
-                )
-            }
-
-            // Recommended songs as vertical list for variety
-            when (val state = recommendedState) {
-                is HomeUiState.Loading -> {
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = CueColors.BluePrimary)
-                        }
-                    }
-                }
-                is HomeUiState.Success -> {
-                    items(state.data.size) { index ->
-                        val song = state.data[index]
-                        VerticalSongCard(
-                            song = song,
-                            onClick = { viewModel.onSongClick(song) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 4.dp)
-                        )
-                    }
-                }
-                is HomeUiState.Error -> {
-                    item {
-                        ErrorState(
-                            message = state.message,
-                            onRetry = { /* Retry loading */ },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                                .padding(16.dp)
-                        )
-                    }
-                }
-            }
-        }
-
-        // Search Bar at the bottom
+        // Search Bar
         SearchBar(
-            query = searchQuery,
-            onQueryChange = { viewModel.onSearchQueryChanged(it) },
-            onSearch = { onSearchClick() },
+            onSearch = { query ->
+                if (query.isNotBlank()) {
+                    navController.navigate("search/$query")
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .border(1.dp, CueColors.MediumGray, shape = CueShapes.medium)
                 .clip(CueShapes.medium)
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Category Grid
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.weight(1f)
+        ) {
+            items(categories) { category ->
+                val count = when (category.id) {
+                    "songs" -> songs.size
+                    "albums" -> albums.size
+                    "artists" -> artists.size
+                    "playlists" -> playlists.size
+                    "favorites" -> favoriteSongs.size
+                    "recent" -> viewModel.recentlyPlayed.collectAsState().value.size
+                    else -> 0
+                }
+
+                CategoryButton(
+                    title = category.title,
+                    iconRes = category.iconRes,
+                    count = count,
+                    color = category.color,
+                    onClick = {
+                        when (category.id) {
+                            "songs" -> navController.navigate("song_list/all")
+                            "albums" -> navController.navigate("album_list")
+                            "artists" -> navController.navigate("artist_list")
+                            "playlists" -> navController.navigate("playlist_list")
+                            "favorites" -> navController.navigate("favorite_list")
+                            "recent" -> navController.navigate("recent_list")
+                        }
+                    }
+                )
+            }
+        }
+
+        // Mini Player (if a song is playing)
+        if (currentSong != null) {
+            MiniPlayer(
+                song = currentSong!!,
+                isPlaying = viewModel.isPlaying.collectAsState().value,
+                onPlayPause = { viewModel.playPause() },
+                onNext = { viewModel.skipToNext() },
+                onPrevious = { viewModel.skipToPrevious() },
+                onTap = {
+                    navController.navigate("now_playing")
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            )
+        }
     }
 }
 
+@Preview
+@Composable
+fun HomeScreenPreview() {
+    CueTheme {
+        HomeScreen(navController = rememberNavController())
+    }
+}

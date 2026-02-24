@@ -3,8 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 
     id("kotlin-parcelize")
-    id("com.google.dagger.hilt.android")
-    id("com.google.devtools.ksp") version "2.3.5"
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
 }
 
 android {
