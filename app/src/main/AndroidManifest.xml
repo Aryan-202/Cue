@@ -32,8 +32,9 @@
         </provider>
 
         <activity
-            android:name=""
-            android:exported="true">
+            android:name=".CueActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Cue">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
