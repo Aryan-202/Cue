@@ -3,6 +3,9 @@ package com.music.cue.org.theme
 import com.music.cue.org.R
 
 data class Icons(
+
+    val app_icon: Int = R.drawable.app_icon,
+
     val play_button: Int = R.drawable.play_button,
     val pause_button: Int = R.drawable.pause_button,
     val next_button: Int = R.drawable.skip_next_circle_button,
