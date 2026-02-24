@@ -48,4 +48,9 @@ object CueIcons {
     @DrawableRes
     val MoreHorizontalEmpty = R.drawable.more_horizontal_empty_button
 
+    @DrawableRes
+    val SearchButton = R.drawable.search_button
+
+    @DrawableRes
+    val CloseButton = R.drawable.close_button
 }
