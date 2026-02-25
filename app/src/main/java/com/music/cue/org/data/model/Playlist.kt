@@ -1,7 +1,6 @@
-package com.music.cue.org.model
+package com.music.cue.org.data.model
 
 import android.os.Parcelable
-import com.music.cue.org.data.model.Song
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

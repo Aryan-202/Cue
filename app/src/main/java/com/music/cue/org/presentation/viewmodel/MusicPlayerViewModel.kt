@@ -8,7 +8,7 @@ import com.music.cue.org.data.model.Song
 import com.music.cue.org.data.repository.MusicRepository
 import com.music.cue.org.data.repository.PlaybackRepository
 import com.music.cue.org.data.repository.PlaybackRepository.RepeatMode
-import com.music.cue.org.model.Playlist
+import com.music.cue.org.data.model.Playlist
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
