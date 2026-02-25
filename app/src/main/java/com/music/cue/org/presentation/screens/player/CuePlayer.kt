@@ -2,7 +2,6 @@ package com.music.cue.org.presentation.screens.player
 
 
 import androidx.media3.common.MediaItem
-import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,10 +45,10 @@ class CuePlayer @Inject constructor(private val exoPlayer: ExoPlayer): Player.Li
         exoPlayer.seekTo(position)
     }
 
-    override fun onPlayerError(error: PlaybackException?) {
-        super.onPlayerError(error)
-        playerState.tryEmit(CuePlayerState.STATE_ERROR)
-    }
+//    override fun onPlayerError(error: PlaybackException?) {
+//        super.onPlayerError(error)
+//        playerState.tryEmit(CuePlayerState.STATE_ERROR)
+//    }
 
     override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
         super.onPlayWhenReadyChanged(playWhenReady, reason)
@@ -66,6 +65,14 @@ class CuePlayer @Inject constructor(private val exoPlayer: ExoPlayer): Player.Li
             playerState.tryEmit(CuePlayerState.STATE_NEXT_TRACK)
             playerState.tryEmit(CuePlayerState.STATE_PLAYING)
         }
+    }
+
+    fun getMediaItemCount(): Int {
+        return exoPlayer.mediaItemCount
+    }
+
+    fun getCurrentMediaItemIndex(): Int {
+        return exoPlayer.currentMediaItemIndex
     }
 
 

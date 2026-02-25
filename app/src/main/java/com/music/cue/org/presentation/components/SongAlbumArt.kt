@@ -34,9 +34,9 @@ private fun SongAlbumArt(
             .background(MaterialTheme.colorScheme.surfaceVariant)
     ) {
         // Load album art or show placeholder
-        if (song.albumArt != null) {
+        if (song.albumArtUri != null) {
             AsyncImage(
-                model = song.albumArt,
+                model = song.albumArtUri,
                 contentDescription = "Album Art",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()

@@ -73,7 +73,7 @@ class MediaStoreDataSource @Inject constructor(
                             duration = duration,
                             albumId = albumId,
                             uri = data,
-                            albumArt = albumArtUri,
+                            albumArtUri = albumArtUri?.toString(),
                             dateAdded = dateAdded
                         )
                     )

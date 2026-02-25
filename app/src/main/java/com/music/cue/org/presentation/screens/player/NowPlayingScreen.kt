@@ -187,7 +187,7 @@ fun NowPlayingScreen(
                         // Album art with rotation
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current)
-                                .data(currentSong?.albumArt ?: R.drawable.app_icon)
+                                .data(currentSong?.albumArtUri ?: R.drawable.app_icon)
                                 .crossfade(true)
                                 .build(),
                             contentDescription = null,

@@ -71,7 +71,7 @@ fun MiniPlayer(
             // Album Art
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(song.albumArt ?: R.drawable.ic_launcher_background)
+                    .data(song.albumArtUri ?: R.drawable.ic_launcher_background)
                     .crossfade(true)
                     .build(),
                 contentDescription = null,
