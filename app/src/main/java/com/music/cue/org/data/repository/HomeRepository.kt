@@ -55,12 +55,12 @@ class HomeRepository @Inject constructor() {
     fun getGenres(): Flow<List<Genre>> = flow {
         emit(
             listOf(
-                Genre(1L, "Pop", 245, colorHex = "#FF4F9DFF"),
-                Genre(2L, "Rock", 189, colorHex = "#FFFF6B6B"),
-                Genre(3L, "Hip Hop", 156, colorHex = "#FF845EC2"),
-                Genre(4L, "Electronic", 134, colorHex = "#FF00C9A7"),
-                Genre(5L, "Jazz", 78, colorHex = "#FFFFD93D"),
-                Genre(6L, "Classical", 67, colorHex = "#FF6C5B7B")
+                Genre(1L, "Pop", 245,),
+                Genre(2L, "Rock", 189),
+                Genre(3L, "Hip Hop", 156),
+                Genre(4L, "Electronic", 134,),
+                Genre(5L, "Jazz", 78, ),
+                Genre(6L, "Classical", 67,)
             )
         )
     }

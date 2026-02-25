@@ -17,7 +17,9 @@ import com.music.cue.org.presentation.screens.songlist.SongListScreen
 import com.music.cue.org.presentation.screens.home.HomeScreen
 import com.music.cue.org.presentation.viewmodel.MusicPlayerViewModel
 import com.music.cue.org.theme.CueTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class CueActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

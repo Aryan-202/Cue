@@ -35,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.music.cue.org.R
+import com.music.cue.org.components.MiniPlayer
 import com.music.cue.org.components.SearchBar
 import com.music.cue.org.presentation.components.CategoryButton
 import com.music.cue.org.presentation.viewmodel.MusicPlayerViewModel

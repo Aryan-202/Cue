@@ -148,26 +148,3 @@ fun MiniPlayer(
         }
     }
 }
-
-@Preview
-@Composable
-fun MiniPlayerPreview() {
-    CueTheme {
-        MiniPlayer(
-            song = Song(
-                id = 1,
-                title = "Test Song",
-                artist = "Test Artist",
-                duration = 180000,
-                albumId = 1,
-                albumArt = null,
-                isFavorite = false
-            ),
-            isPlaying = false,
-            onPlayPause = {},
-            onNext = {},
-            onPrevious = {},
-            onTap = {}
-        )
-    }
-}

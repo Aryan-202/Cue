@@ -237,18 +237,3 @@ fun formatDuration(duration: Long): String {
     }
 }
 
-@Preview
-@Composable
-fun SongListScreenPreview() {
-    CueTheme {
-        SongListScreen(
-            navController = rememberNavController(),
-            title = "All Songs",
-            songs = listOf(
-                Song(1, "Test Song 1", "Artist 1", 180000, 1, ),
-                Song(2, "Test Song 2", "Artist 2", 240000, 1, ),
-                Song(3, "Test Song 3", "Artist 3", 300000, 1, )
-            )
-        )
-    }
-}

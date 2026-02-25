@@ -43,7 +43,7 @@ fun GenreCard(
             .clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(android.graphics.Color.parseColor(genre.colorHex))
+            containerColor = Color(android.graphics.Color.parseColor("#FF6200EE"))
         )
     ) {
         Column(

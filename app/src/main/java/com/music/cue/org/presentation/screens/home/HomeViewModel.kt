@@ -3,7 +3,7 @@ package com.music.cue.org.presentation.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.music.cue.org.domain.model.Song
+import com.music.cue.org.data.model.Song
 import com.music.cue.org.domain.usercase.GetRecentSongsUseCase
 import com.music.cue.org.domain.usercase.GetSongsUseCase
 // import com.music.cue.org.presentation.viewmodel.MusicPlayerViewModel

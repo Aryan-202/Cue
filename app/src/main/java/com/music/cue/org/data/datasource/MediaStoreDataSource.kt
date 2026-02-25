@@ -1,15 +1,19 @@
 package com.music.cue.org.data.datasource
 
 import android.content.Context
+import android.net.Uri
 import android.provider.MediaStore
 import com.music.cue.org.data.model.Song
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class MediaStoreDataSource (
+class MediaStoreDataSource @Inject constructor(
     private val context: Context
 ) {
-    suspend fun getSongsFromDevice(): List<Song> = withContext(Dispatchers.IO) {
+    fun getSongsFromDevice(): Flow<List<Song>> = flow {
         val songs = mutableListOf<Song>()
         val collection = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
 
@@ -19,10 +23,12 @@ class MediaStoreDataSource (
             MediaStore.Audio.Media.ARTIST,
             MediaStore.Audio.Media.ALBUM,
             MediaStore.Audio.Media.ALBUM_ID,
-            MediaStore.Audio.Media.DURATION
+            MediaStore.Audio.Media.DURATION,
+            MediaStore.Audio.Media.DATA,
+            MediaStore.Audio.Media.DATE_ADDED
         )
 
-        val selection = "${MediaStore.Audio.Media.IS_MUSIC} != 0}"
+        val selection = "${MediaStore.Audio.Media.IS_MUSIC} != 0"
 
         context.contentResolver.query(
             collection,
@@ -30,23 +36,32 @@ class MediaStoreDataSource (
             selection,
             null,
             "${MediaStore.Audio.Media.TITLE} ASC"
-        )?.use {
-            val idColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
-            val titleColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
-            val artistColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
-            val albumColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
-            val durationColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
-            val albumIdColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
+        )?.use { cursor ->
+            val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
+            val titleColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
+            val artistColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
+            val albumColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
+            val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+            val albumIdColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
+            val dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+            val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
 
+            while (cursor.moveToNext()) {
+                val id = cursor.getLong(idColumn)
+                val title = cursor.getString(titleColumn) ?: "Unknown"
+                val artist = cursor.getString(artistColumn) ?: "Unknown Artist"
+                val album = cursor.getString(albumColumn) ?: "Unknown Album"
+                val duration = cursor.getLong(durationColumn)
+                val albumId = cursor.getLong(albumIdColumn)
+                val data = cursor.getString(dataColumn)
+                val dateAdded = cursor.getLong(dateAddedColumn)
 
-            while (it.moveToNext()) {
-                val id = it.getLong(idColumn)
-                val title = it.getString(titleColumn)
-                val artist = it.getString(artistColumn)
-                val album = it.getString(albumColumn)
-                val duration = it.getLong(durationColumn)
-                val albumId = it.getLong(albumIdColumn)
-
+                // Create album art URI
+                val albumArtUri = try {
+                    Uri.parse("content://media/external/audio/albumart/$albumId")
+                } catch (e: Exception) {
+                    null
+                }
 
                 songs.add(
                     Song(
@@ -55,11 +70,14 @@ class MediaStoreDataSource (
                         artist = artist,
                         album = album,
                         duration = duration,
-                        albumId = albumId
+                        albumId = albumId,
+                        uri = data,
+                        albumArt = albumArtUri,
+                        dateAdded = dateAdded
                     )
                 )
             }
         }
-        return@withContext songs
+        emit(songs)
     }
 }
