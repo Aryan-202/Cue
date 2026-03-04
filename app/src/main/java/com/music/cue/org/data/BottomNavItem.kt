@@ -11,6 +11,11 @@ data class BottomNavItem(
 
 val bottomNavItems = listOf(
     BottomNavItem(
+        title = "Home",
+        route = "home",
+        icon = CueIcons.AppIcon,
+    ),
+    BottomNavItem(
         title = "Favorites",
         route = "favorites",
         icon = CueIcons.AppIcon,

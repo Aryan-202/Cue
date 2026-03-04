@@ -18,7 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import com.music.cue.org.data.bottomNavItems
 
 @Composable
-fun CueBottomNavigation(
+fun CueNavigation(
     modifier: Modifier = Modifier
 ) {
 
@@ -56,6 +56,6 @@ fun CueBottomNavigation(
 
 @Composable
 @Preview
-fun CueBottomNavigationPreview() {
-    CueBottomNavigation()
+fun CueNavigationPreview() {
+    CueNavigation()
 }
