@@ -9,7 +9,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -40,7 +40,7 @@ class CueActivity : ComponentActivity() {
 @Composable
 fun CueApp() {
     val navController = rememberNavController()
-    val viewModel: MusicPlayerViewModel = viewModel()
+    val viewModel: MusicPlayerViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
@@ -108,9 +108,9 @@ fun CueApp() {
         composable("search/{query}") { backStackEntry ->
             val query = backStackEntry.arguments?.getString("query") ?: ""
             val allSongs = viewModel.songs.collectAsState().value
-            val searchResults = allSongs.filter {
-                it.title.contains(query, ignoreCase = true) ||
-                        it.artist.contains(query, ignoreCase = true)
+            val searchResults = allSongs.filter { song ->
+                song.title.contains(query, ignoreCase = true) ||
+                        song.artist.contains(query, ignoreCase = true)
             }
             SongListScreen(
                 navController = navController,

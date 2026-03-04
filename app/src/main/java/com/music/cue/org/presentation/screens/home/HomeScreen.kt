@@ -199,8 +199,8 @@ fun HomeScreen(
                 song = currentSong!!,
                 isPlaying = viewModel.isPlaying.collectAsState().value,
                 onPlayPause = { viewModel.playPause() },
-                onNext = { viewModel.skipToNext() },
-                onPrevious = { viewModel.skipToPrevious() },
+                onNext = {  },
+                onPrevious = {  },
                 onTap = {
                     navController.navigate("now_playing")
                 },

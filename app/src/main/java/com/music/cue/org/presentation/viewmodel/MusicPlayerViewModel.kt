@@ -4,7 +4,11 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
+import com.music.cue.org.data.model.Album
+import com.music.cue.org.data.model.Artist
+import com.music.cue.org.data.model.Playlist
 import com.music.cue.org.data.model.Song
+import com.music.cue.org.data.repository.MusicRepository
 import com.music.cue.org.presentation.screens.player.CuePlayer
 import com.music.cue.org.presentation.screens.player.CuePlayerState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +24,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class MusicPlayerViewModel @Inject constructor(
-    private val cuePlayer: CuePlayer
+    private val cuePlayer: CuePlayer,
+    private val musicRepository: MusicRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MusicPlayerUiState())
@@ -40,6 +45,25 @@ class MusicPlayerViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
     val currentSongIndex: StateFlow<Int> = _uiState.map { it.currentSongIndex }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), 0)
+    
+    val songs: StateFlow<List<Song>> = musicRepository.getAllSongs()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val favoriteSongs: StateFlow<List<Song>> = musicRepository.getFavoriteSongs()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val recentlyPlayed: StateFlow<List<Song>> = musicRepository.getRecentlyPlayedIds()
+        .map { ids -> ids.mapNotNull { musicRepository.getSongById(it) } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    private val _albums = MutableStateFlow<List<Album>>(emptyList())
+    val albums: StateFlow<List<Album>> = _albums.asStateFlow()
+
+    private val _artists = MutableStateFlow<List<Artist>>(emptyList())
+    val artists: StateFlow<List<Artist>> = _artists.asStateFlow()
+
+    private val _playlists = MutableStateFlow<List<Playlist>>(emptyList())
+    val playlists: StateFlow<List<Playlist>> = _playlists.asStateFlow()
 
     private var currentPlaylist: List<Song> = emptyList()
 

@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
 import com.music.cue.org.data.model.Song
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -11,7 +12,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class MediaStoreDataSource @Inject constructor(
-    private val context: Context
+    @ApplicationContext private val context: Context
 ) {
     fun getSongsFromDevice(): Flow<List<Song>> = flow {
         val songs = withContext(Dispatchers.IO) {
