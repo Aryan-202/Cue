@@ -20,10 +20,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.music.cue.org.R
+import com.music.cue.org.data.Artist
 
 @Composable
 fun ArtistGridCard(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    artist: Artist
 ) {
     Card(
         modifier = Modifier
@@ -55,7 +57,7 @@ fun ArtistGridCard(
                 Spacer( modifier = modifier.padding(8.dp) )
 
                 Text(
-                    text = "Artist Name",
+                    text = artist.name,
                     modifier = modifier
                         .align(Alignment.CenterHorizontally)
                 )
@@ -67,5 +69,5 @@ fun ArtistGridCard(
 @Composable
 @Preview
 fun ArtistGridCardPreview() {
-    ArtistGridCard()
+    ArtistGridCard(artist = Artist(id = 1, name = "Artist Name"))
 }
