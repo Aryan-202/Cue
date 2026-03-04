@@ -1,9 +1,7 @@
 package com.music.cue.org.components
 
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.PrimaryScrollableTabRow
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,38 +19,32 @@ import com.music.cue.org.data.bottomNavItems
 fun CueNavigation(
     modifier: Modifier = Modifier
 ) {
-
-    // favorites, playlists, tracks, albums, artists, folders
     var selectItemIndex by remember { mutableIntStateOf(2) }
     val navController = rememberNavController()
 
-    Scaffold(
+
+    PrimaryScrollableTabRow(
+        selectedTabIndex = selectItemIndex,
         modifier = modifier
-    ) { contentPadding ->
-        PrimaryScrollableTabRow(
-            selectedTabIndex = selectItemIndex,
-            modifier = Modifier.padding(contentPadding)
-        ) {
-            bottomNavItems.forEachIndexed { index, destination ->
-                Tab(
-                    selected = selectItemIndex == index,
-                    onClick = {
-                        navController.navigate(route = destination.route)
-                        selectItemIndex = index
-                    },
-                    text = {
-                        Text(
-                            text = destination.title,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                )
-            }
+    ) {
+        bottomNavItems.forEachIndexed { index, destination ->
+            Tab(
+                selected = selectItemIndex == index,
+                onClick = {
+                    navController.navigate(route = destination.route)
+                    selectItemIndex = index
+                },
+                text = {
+                    Text(
+                        text = destination.title,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            )
         }
     }
 }
-
 
 @Composable
 @Preview
