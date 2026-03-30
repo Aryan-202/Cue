@@ -26,12 +26,10 @@ class CueActivity : ComponentActivity() {
 
         setContent {
             CueTheme {
-                // Scaffold provides the basic visual layout structure (TopBar, BottomBar, etc.)
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = MaterialTheme.colorScheme.background
                 ) { innerPadding ->
-                    // We pass the innerPadding to our screen to avoid drawing under the status bar
                     MainPlayerScreen(
                         name = "Aryan",
                         modifier = Modifier.padding(innerPadding)
