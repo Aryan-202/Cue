@@ -2,4 +2,11 @@
 <resources>
 
     <style name="Theme.Cue" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.CueSplashScreen" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background_color</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.Cue</item>
+    </style>
+
 </resources>
