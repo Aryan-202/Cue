@@ -21,7 +21,8 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeScreenViewModel = viewModel(
         factory = HomeScreenViewModelFactory(SongRepos(LocalContext.current))
-    )
+    ),
+    onSongClick: () -> Unit = {}
 ) {
     val songs by viewModel.songs.collectAsState()
     val selectedSong by viewModel.selectedSong.collectAsState()
@@ -31,7 +32,8 @@ fun HomeScreen(
             item {
                 ListItem(
                     headlineContent = { Text("Now Playing: ${song.title}") },
-                    supportingContent = { Text(song.artist) }
+                    supportingContent = { Text(song.artist) },
+                    modifier = Modifier.clickable { onSongClick() }
                 )
             }
             item {
@@ -44,6 +46,7 @@ fun HomeScreen(
                 supportingContent = { Text(song.artist) },
                 modifier = Modifier.clickable {
                     viewModel.onSongSelected(song)
+                    onSongClick()
                 }
             )
         }

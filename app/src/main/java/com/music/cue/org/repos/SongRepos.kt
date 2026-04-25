@@ -14,7 +14,8 @@ class SongRepos(private val context: Context) {
             MediaStore.Audio.Media.TITLE,
             MediaStore.Audio.Media.ARTIST,
             MediaStore.Audio.Media.ALBUM,
-            MediaStore.Audio.Media.DURATION
+            MediaStore.Audio.Media.DURATION,
+            MediaStore.Audio.Media.ALBUM_ID
         )
 
         context.contentResolver.query(
@@ -29,6 +30,7 @@ class SongRepos(private val context: Context) {
             val artistColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
             val albumColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
             val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+            val albumIdColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
 
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
@@ -36,9 +38,14 @@ class SongRepos(private val context: Context) {
                 val artist = cursor.getString(artistColumn)
                 val album = cursor.getString(albumColumn)
                 val duration = cursor.getLong(durationColumn)
+                val albumId = cursor.getLong(albumIdColumn)
                 val contentUri = ContentUris.withAppendedId(collection, id).toString()
+                val albumArtUri = ContentUris.withAppendedId(
+                    android.net.Uri.parse("content://media/external/audio/albumart"),
+                    albumId
+                ).toString()
 
-                songs.add(Song(id, title, artist, album, duration, contentUri))
+                songs.add(Song(id, title, artist, album, duration, contentUri, albumArtUri))
             }
         }
         return songs
