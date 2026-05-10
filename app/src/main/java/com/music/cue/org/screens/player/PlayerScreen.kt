@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.music.cue.org.data.Song
 import com.music.cue.org.ui.components.CustomLinearProgressIndicator
+import com.music.cue.org.ui.components.MarqueeText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,10 +99,10 @@ fun PlayerScreen(
             verticalArrangement = Arrangement.SpaceEvenly
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
+                MarqueeText(
                     text = song?.title ?: "No Song Selected",
                     style = MaterialTheme.typography.headlineMedium,
-                    maxLines = 1
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
                 Text(
                     text = song?.artist ?: "Unknown Artist",

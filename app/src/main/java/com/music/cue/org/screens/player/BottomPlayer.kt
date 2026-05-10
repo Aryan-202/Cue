@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.music.cue.org.data.Song
 import com.music.cue.org.ui.components.CustomLinearProgressIndicator
+import com.music.cue.org.ui.components.MarqueeText
 import kotlin.math.abs
 
 @Composable
@@ -135,10 +136,9 @@ fun BottomPlayer(
                         Spacer(modifier = Modifier.width(12.dp))
 
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(
+                            MarqueeText(
                                 text = currentSong?.title ?: "Not Playing",
-                                style = MaterialTheme.typography.bodyLarge,
-                                maxLines = 1
+                                style = MaterialTheme.typography.bodyLarge
                             )
                             if (currentSong?.artist?.isNotEmpty() == true) {
                                 Text(
