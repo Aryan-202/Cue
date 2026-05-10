@@ -4,6 +4,7 @@ import android.content.ContentUris
 import android.content.Context
 import android.provider.MediaStore
 import com.music.cue.org.data.Song
+import androidx.core.net.toUri
 
 class SongRepos(private val context: Context) {
     fun fetchSongs(): List<Song> {
@@ -41,7 +42,7 @@ class SongRepos(private val context: Context) {
                 val albumId = cursor.getLong(albumIdColumn)
                 val contentUri = ContentUris.withAppendedId(collection, id).toString()
                 val albumArtUri = ContentUris.withAppendedId(
-                    android.net.Uri.parse("content://media/external/audio/albumart"),
+                    "content://media/external/audio/albumart".toUri(),
                     albumId
                 ).toString()
 
