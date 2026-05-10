@@ -68,10 +68,13 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
                         if (currentRoute == "home" && selectedSong != null) {
+                            val currentPosition by homeScreenViewModel.currentPosition.collectAsState()
+                            val duration by homeScreenViewModel.duration.collectAsState()
                             BottomPlayer(
-                                trackName = selectedSong?.title ?: "",
-                                artistName = selectedSong?.artist ?: "",
+                                song = selectedSong,
                                 isPlaying = isPlaying,
+                                currentPosition = currentPosition,
+                                duration = duration,
                                 onTogglePlay = { homeScreenViewModel.togglePlayPause() },
                                 onSkipPrevious = { homeScreenViewModel.previous() },
                                 onSkipNext = { homeScreenViewModel.next() },
@@ -94,12 +97,17 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable("player") {
+                            val currentPosition by homeScreenViewModel.currentPosition.collectAsState()
+                            val duration by homeScreenViewModel.duration.collectAsState()
                             PlayerScreen(
                                 song = selectedSong,
                                 isPlaying = isPlaying,
+                                currentPosition = currentPosition,
+                                duration = duration,
                                 onTogglePlay = { homeScreenViewModel.togglePlayPause() },
                                 onNext = { homeScreenViewModel.next() },
                                 onPrevious = { homeScreenViewModel.previous() },
+                                onSeek = { homeScreenViewModel.seekTo(it) },
                                 onBack = { navController.popBackStack() }
                             )
                         }

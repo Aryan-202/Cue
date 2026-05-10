@@ -29,6 +29,12 @@ class HomeScreenViewModel(private val repository: SongRepos) : ViewModel() {
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying.asStateFlow()
 
+    private val _currentPosition = MutableStateFlow(0L)
+    val currentPosition: StateFlow<Long> = _currentPosition.asStateFlow()
+
+    private val _duration = MutableStateFlow(0L)
+    val duration: StateFlow<Long> = _duration.asStateFlow()
+
     private var mediaController: MediaController? = null
 
     init {
@@ -42,6 +48,9 @@ class HomeScreenViewModel(private val repository: SongRepos) : ViewModel() {
             mediaController?.addListener(object : Player.Listener {
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
                     _isPlaying.value = isPlaying
+                    if (isPlaying) {
+                        startProgressUpdate()
+                    }
                 }
 
                 override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
@@ -49,9 +58,30 @@ class HomeScreenViewModel(private val repository: SongRepos) : ViewModel() {
                     if (currentSong != null) {
                         _selectedSong.value = currentSong
                     }
+                    _duration.value = mediaController?.duration?.coerceAtLeast(0L) ?: 0L
+                }
+
+                override fun onPlaybackStateChanged(playbackState: Int) {
+                    if (playbackState == Player.STATE_READY) {
+                        _duration.value = mediaController?.duration?.coerceAtLeast(0L) ?: 0L
+                    }
                 }
             })
         }
+    }
+
+    private fun startProgressUpdate() {
+        viewModelScope.launch {
+            while (_isPlaying.value) {
+                _currentPosition.value = mediaController?.currentPosition?.coerceAtLeast(0L) ?: 0L
+                kotlinx.coroutines.delay(500)
+            }
+        }
+    }
+
+    fun seekTo(position: Long) {
+        mediaController?.seekTo(position)
+        _currentPosition.value = position
     }
 
     fun refreshSongs() {

@@ -2,6 +2,7 @@ package com.music.cue.org.screens.player
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,7 +28,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -43,15 +43,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.music.cue.org.data.Song
+import com.music.cue.org.ui.components.CustomLinearProgressIndicator
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerScreen(
     song: Song?,
     isPlaying: Boolean,
+    currentPosition: Long,
+    duration: Long,
     onTogglePlay: () -> Unit,
     onNext: () -> Unit,
     onPrevious: () -> Unit,
+    onSeek: (Long) -> Unit,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = {}
 ) {
@@ -133,11 +137,21 @@ fun PlayerScreen(
             }
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                // Progress Slider
-                Slider(
-                    value = 0f,
-                    onValueChange = {},
-                    modifier = Modifier.padding(horizontal = 24.dp)
+                // Custom Progress Indicator
+                CustomLinearProgressIndicator(
+                    progress = if (duration > 0) currentPosition.toFloat() / duration.toFloat() else 0f,
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                        .fillMaxWidth()
+                        .height(12.dp)
+                        .pointerInput(duration) {
+                            detectTapGestures { offset ->
+                                if (duration > 0) {
+                                    val newProgress = offset.x / size.width
+                                    onSeek((newProgress * duration).toLong())
+                                }
+                            }
+                        }
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
