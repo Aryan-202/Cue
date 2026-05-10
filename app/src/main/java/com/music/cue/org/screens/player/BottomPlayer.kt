@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
@@ -54,9 +55,10 @@ fun BottomPlayer(
 
     Surface(
         modifier = modifier
-            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 8.dp)
             .navigationBarsPadding()
-            .height(72.dp)
+            .fillMaxWidth()
+            .height(64.dp)
             .pointerInput(Unit) {
                 detectDragGestures(
                     onDrag = { change, dragAmount ->
@@ -82,8 +84,9 @@ fun BottomPlayer(
                     }
                 )
             },
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        tonalElevation = 8.dp
+        color = MaterialTheme.colorScheme.primaryContainer,
+        shape = RoundedCornerShape(12.dp),
+        shadowElevation = 8.dp
     ) {
         AnimatedContent(
             targetState = trackName,
