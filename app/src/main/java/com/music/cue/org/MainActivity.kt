@@ -15,11 +15,13 @@ import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.music.cue.org.repos.SongRepos
 import com.music.cue.org.screens.home.HomeScreen
 import com.music.cue.org.screens.home.HomeScreenViewModel
 import com.music.cue.org.screens.home.HomeScreenViewModelFactory
+import com.music.cue.org.screens.player.BottomPlayer
 import com.music.cue.org.screens.player.PlayerScreen
 import com.music.cue.org.screens.splash.SplashScreenViewModel
 import com.music.cue.org.ui.theme.CueTheme
@@ -31,6 +33,7 @@ class MainActivity : ComponentActivity() {
     private val homeScreenViewModel: HomeScreenViewModel by viewModels {
         HomeScreenViewModelFactory(SongRepos(this))
     }
+    
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen().setKeepOnScreenCondition {
@@ -58,28 +61,48 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val selectedSong by homeScreenViewModel.selectedSong.collectAsState()
                 val isPlaying by homeScreenViewModel.isPlaying.collectAsState()
-                
-                NavHost(navController = navController, startDestination = "home") {
-                    composable("home") {
-                        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
+
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    bottomBar = {
+                        if (currentRoute == "home" && selectedSong != null) {
+                            BottomPlayer(
+                                trackName = selectedSong?.title ?: "",
+                                artistName = selectedSong?.artist ?: "",
+                                isPlaying = isPlaying,
+                                onTogglePlay = { homeScreenViewModel.togglePlayPause() },
+                                onSkipPrevious = { homeScreenViewModel.previous() },
+                                onSkipNext = { homeScreenViewModel.next() },
+                                onSwipeUp = { navController.navigate("player") }
+                            )
+                        }
+                    }
+                ) { innerPadding ->
+                    NavHost(
+                        navController = navController,
+                        startDestination = "home",
+                        modifier = Modifier.padding(innerPadding)
+                    ) {
+                        composable("home") {
                             HomeScreen(
-                                modifier = Modifier.padding(innerPadding),
                                 viewModel = homeScreenViewModel,
                                 onSongClick = {
                                     navController.navigate("player")
                                 }
                             )
                         }
-                    }
-                    composable("player") {
-                        PlayerScreen(
-                            song = selectedSong,
-                            isPlaying = isPlaying,
-                            onTogglePlay = { homeScreenViewModel.togglePlayPause() },
-                            onNext = { homeScreenViewModel.next() },
-                            onPrevious = { homeScreenViewModel.previous() },
-                            onBack = { navController.popBackStack() }
-                        )
+                        composable("player") {
+                            PlayerScreen(
+                                song = selectedSong,
+                                isPlaying = isPlaying,
+                                onTogglePlay = { homeScreenViewModel.togglePlayPause() },
+                                onNext = { homeScreenViewModel.next() },
+                                onPrevious = { homeScreenViewModel.previous() },
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
                     }
                 }
             }

@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,31 +31,8 @@ fun HomeScreen(
     onSongClick: () -> Unit = {}
 ) {
     val songs by viewModel.songs.collectAsState()
-    val selectedSong by viewModel.selectedSong.collectAsState()
 
     LazyColumn(modifier = modifier.fillMaxSize()) {
-        selectedSong?.let { song ->
-            item {
-                ListItem(
-                    headlineContent = { Text("Now Playing: ${song.title}") },
-                    supportingContent = { Text(song.artist) },
-                leadingContent = {
-                    AsyncImage(
-                        model = song.albumArtUri,
-                        contentDescription = null,
-                        modifier = Modifier.size(56.dp),
-                        contentScale = ContentScale.Crop,
-                        placeholder = rememberVectorPainter(Icons.Default.MusicNote),
-                        error = rememberVectorPainter(Icons.Default.MusicNote)
-                    )
-                },
-                    modifier = Modifier.clickable { onSongClick() }
-                )
-            }
-            item {
-                HorizontalDivider()
-            }
-        }
         items(songs) { song ->
             ListItem(
                 headlineContent = { Text(song.title) },
