@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.launch
+import androidx.core.net.toUri
 
 class HomeScreenViewModel(private val repository: SongRepos) : ViewModel() {
     private val _songs = MutableStateFlow<List<Song>>(emptyList())
@@ -64,7 +65,7 @@ class HomeScreenViewModel(private val repository: SongRepos) : ViewModel() {
         mediaController?.let { controller ->
             val mediaItem = MediaItem.Builder()
                 .setMediaId(song.contentUri)
-                .setUri(android.net.Uri.parse(song.contentUri))
+                .setUri(song.contentUri.toUri())
                 .build()
             controller.setMediaItem(mediaItem)
             controller.prepare()

@@ -2,8 +2,11 @@ package com.music.cue.org.screens.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
@@ -11,9 +14,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.music.cue.org.repos.SongRepos
 
 @Composable
@@ -33,6 +40,16 @@ fun HomeScreen(
                 ListItem(
                     headlineContent = { Text("Now Playing: ${song.title}") },
                     supportingContent = { Text(song.artist) },
+                leadingContent = {
+                    AsyncImage(
+                        model = song.albumArtUri,
+                        contentDescription = null,
+                        modifier = Modifier.size(56.dp),
+                        contentScale = ContentScale.Crop,
+                        placeholder = rememberVectorPainter(Icons.Default.MusicNote),
+                        error = rememberVectorPainter(Icons.Default.MusicNote)
+                    )
+                },
                     modifier = Modifier.clickable { onSongClick() }
                 )
             }
@@ -44,6 +61,16 @@ fun HomeScreen(
             ListItem(
                 headlineContent = { Text(song.title) },
                 supportingContent = { Text(song.artist) },
+                leadingContent = {
+                    AsyncImage(
+                        model = song.albumArtUri,
+                        contentDescription = null,
+                        modifier = Modifier.size(56.dp),
+                        contentScale = ContentScale.Crop,
+                        placeholder = rememberVectorPainter(Icons.Default.MusicNote),
+                        error = rememberVectorPainter(Icons.Default.MusicNote)
+                    )
+                },
                 modifier = Modifier.clickable {
                     viewModel.onSongSelected(song)
                     onSongClick()
