@@ -86,7 +86,7 @@ class HomeScreenViewModel(private val repository: SongRepos) : ViewModel() {
 
     fun refreshSongs() {
         viewModelScope.launch {
-            _songs.value = repository.fetchSongs()
+            _songs.value = repository.fetchSongs().sortedBy { it.title.lowercase() }
         }
     }
 
