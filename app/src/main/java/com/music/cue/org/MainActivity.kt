@@ -58,6 +58,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CueTheme {
                 val navController = rememberNavController()
+                val songs by homeScreenViewModel.songs.collectAsState()
                 val selectedSong by homeScreenViewModel.selectedSong.collectAsState()
                 val isPlaying by homeScreenViewModel.isPlaying.collectAsState()
                 val currentPosition by homeScreenViewModel.currentPosition.collectAsState()
@@ -87,13 +88,15 @@ class MainActivity : ComponentActivity() {
                     if (selectedSong != null) {
                         ExpandingPlayer(
                             song = selectedSong,
+                            songs = songs,
                             isPlaying = isPlaying,
                             currentPosition = currentPosition,
                             duration = duration,
                             onTogglePlay = { homeScreenViewModel.togglePlayPause() },
                             onNext = { homeScreenViewModel.next() },
                             onPrevious = { homeScreenViewModel.previous() },
-                            onSeek = { homeScreenViewModel.seekTo(it) }
+                            onSeek = { homeScreenViewModel.seekTo(it) },
+                            onSongSelected = { homeScreenViewModel.onSongSelected(it) }
                         )
                     }
                 }
