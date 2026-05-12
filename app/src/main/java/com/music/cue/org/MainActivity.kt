@@ -25,12 +25,14 @@ import com.music.cue.org.screens.splash.SplashScreenViewModel
 import com.music.cue.org.ui.components.ExpandingPlayer
 import com.music.cue.org.ui.theme.CueTheme
 import com.music.cue.org.utils.Permissions
+import com.music.cue.org.utils.UserPrefs
 
 class MainActivity : ComponentActivity() {
 
     private val splashScreenViewModel: SplashScreenViewModel by viewModels()
     private val homeScreenViewModel: HomeScreenViewModel by viewModels {
-        HomeScreenViewModelFactory(SongRepos(this))
+        val userPrefs = UserPrefs(this)
+        HomeScreenViewModelFactory(SongRepos(this), userPrefs)
     }
     
 

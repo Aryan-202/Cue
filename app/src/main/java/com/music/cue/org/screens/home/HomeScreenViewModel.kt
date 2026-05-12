@@ -12,6 +12,7 @@ import androidx.media3.session.SessionToken
 import com.music.cue.org.data.Song
 import com.music.cue.org.playback.PlaybackService
 import com.music.cue.org.repos.SongRepos
+import com.music.cue.org.utils.UserPrefs
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,7 +32,10 @@ data class GroupedItem(
     val artworkUri: String? = null
 )
 
-class HomeScreenViewModel(private val repository: SongRepos) : ViewModel() {
+class HomeScreenViewModel(
+    private val repository: SongRepos,
+    private val userPrefs: UserPrefs
+) : ViewModel() {
     private val _allSongs = MutableStateFlow<List<Song>>(emptyList())
     
     private val _displaySongs = MutableStateFlow<List<Song>>(emptyList())
@@ -84,6 +88,7 @@ class HomeScreenViewModel(private val repository: SongRepos) : ViewModel() {
                     val currentSong = _allSongs.value.find { it.contentUri == mediaItem?.mediaId }
                     if (currentSong != null) {
                         _selectedSong.value = currentSong
+                        userPrefs.saveLastSongId(currentSong.id)
                     }
                     _duration.value = mediaController?.duration?.coerceAtLeast(0L) ?: 0L
                 }
@@ -94,14 +99,27 @@ class HomeScreenViewModel(private val repository: SongRepos) : ViewModel() {
                     }
                 }
             })
+
+            // Restore playback state if a song was loaded from prefs
+            _selectedSong.value?.let { song ->
+                val mediaItem = MediaItem.Builder()
+                    .setMediaId(song.contentUri)
+                    .setUri(song.contentUri.toUri())
+                    .build()
+                mediaController?.setMediaItem(mediaItem)
+                mediaController?.seekTo(userPrefs.getLastPosition())
+                mediaController?.prepare()
+            }
         }
     }
 
-    private fun startProgressUpdate() {
+    fun startProgressUpdate() {
         progressJob?.cancel()
         progressJob = viewModelScope.launch {
             while (_isPlaying.value) {
-                _currentPosition.value = mediaController?.currentPosition?.coerceAtLeast(0L) ?: 0L
+                val position = mediaController?.currentPosition?.coerceAtLeast(0L) ?: 0L
+                _currentPosition.value = position
+                userPrefs.saveLastPosition(position)
                 delay(500)
             }
         }
@@ -116,6 +134,30 @@ class HomeScreenViewModel(private val repository: SongRepos) : ViewModel() {
         viewModelScope.launch {
             val allSongs = repository.fetchSongs()
             _allSongs.value = allSongs
+            
+            // Load last played song
+            val lastId = userPrefs.getLastSongId()
+            if (lastId != -1L && _selectedSong.value == null) {
+                val lastSong = allSongs.find { it.id == lastId }
+                if (lastSong != null) {
+                    _selectedSong.value = lastSong
+                    _duration.value = lastSong.durationMs
+                    val lastPos = userPrefs.getLastPosition()
+                    _currentPosition.value = lastPos
+                    
+                    // Pre-load on controller if already initialized
+                    mediaController?.let { controller ->
+                        val mediaItem = MediaItem.Builder()
+                            .setMediaId(lastSong.contentUri)
+                            .setUri(lastSong.contentUri.toUri())
+                            .build()
+                        controller.setMediaItem(mediaItem)
+                        controller.seekTo(lastPos)
+                        controller.prepare()
+                    }
+                }
+            }
+            
             updateDisplay()
         }
     }
@@ -190,6 +232,7 @@ class HomeScreenViewModel(private val repository: SongRepos) : ViewModel() {
 
     fun onSongSelected(song: Song) {
         _selectedSong.value = song
+        userPrefs.saveLastSongId(song.id)
         mediaController?.let { controller ->
             val mediaItem = MediaItem.Builder()
                 .setMediaId(song.contentUri)
@@ -221,11 +264,14 @@ class HomeScreenViewModel(private val repository: SongRepos) : ViewModel() {
     }
 }
 
-class HomeScreenViewModelFactory(private val repository: SongRepos) : ViewModelProvider.Factory {
+class HomeScreenViewModelFactory(
+    private val repository: SongRepos,
+    private val userPrefs: UserPrefs
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomeScreenViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return HomeScreenViewModel(repository) as T
+            return HomeScreenViewModel(repository, userPrefs) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

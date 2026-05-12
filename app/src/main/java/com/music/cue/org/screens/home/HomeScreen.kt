@@ -40,13 +40,15 @@ import coil.request.ImageRequest
 import com.music.cue.org.data.Song
 import com.music.cue.org.repos.SongRepos
 import com.music.cue.org.ui.components.NavigationBar
+import com.music.cue.org.utils.UserPrefs
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    context: android.content.Context = LocalContext.current,
     viewModel: HomeScreenViewModel = viewModel(
-        factory = HomeScreenViewModelFactory(SongRepos(LocalContext.current))
+        factory = HomeScreenViewModelFactory(SongRepos(context), UserPrefs(context))
     ),
     onSongClick: () -> Unit = {}
 ) {
