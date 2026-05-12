@@ -1,10 +1,10 @@
 package com.music.cue.org.ui.components
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
@@ -30,12 +30,14 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import java.util.Locale
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.music.cue.org.data.Song
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
+@SuppressLint("ConfigurationScreenWidthHeight")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExpandingPlayer(
@@ -67,24 +69,35 @@ fun ExpandingPlayer(
         (containerHeightPx - collapsedHeightPx - bottomMarginPx).coerceAtLeast(0f)
     }
 
-    // Use Animatable for smooth, interruptible animation and natural dragging
-    val offset = remember { Animatable(0f) }
+    // Start offset at a very large value to keep it off-screen until measured
+    val offset = remember { Animatable(2000f) }
     var isExpanded by remember { mutableStateOf(false) }
     var isOffsetInitialized by remember { mutableStateOf(false) }
 
     // Initialize offset to swipeLimit when swipeLimit is first known
     LaunchedEffect(swipeLimit) {
         if (swipeLimit > 0 && !isOffsetInitialized) {
-            if (!isExpanded) offset.snapTo(swipeLimit)
+            // "Pop" from bottom: animate from off-screen to the collapsed position
             isOffsetInitialized = true
+            offset.animateTo(
+                targetValue = swipeLimit,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = Spring.StiffnessMediumLow
+                )
+            )
         }
     }
 
-    // Automatically expand when a new song starts playing
+    // When a NEW song is selected (not just initialization)
     LaunchedEffect(song.id) {
-        if (!isExpanded && isOffsetInitialized) {
-            isExpanded = true
-            offset.animateTo(0f, spring(stiffness = Spring.StiffnessMediumLow))
+        if (isOffsetInitialized) {
+            // If it's already visible but collapsed, we might want to stay collapsed or bounce
+            // If it's expanded, we stay expanded.
+            // For now, we'll ensure it's at least at the swipeLimit if it was somehow off-screen
+            if (offset.value > swipeLimit) {
+                offset.animateTo(swipeLimit, spring(stiffness = Spring.StiffnessMediumLow))
+            }
         }
     }
 
@@ -225,11 +238,35 @@ fun ExpandingPlayer(
                             )
                             
                             Spacer(modifier = Modifier.height(48.dp))
-                            
-                            CustomLinearProgressIndicator(
-                                progress = if (duration > 0) currentPosition.toFloat() / duration else 0f,
-                                modifier = Modifier.fillMaxWidth().height(12.dp)
+
+                            // Seekable Progress Bar
+                            Slider(
+                                value = if (duration > 0) currentPosition.toFloat() else 0f,
+                                onValueChange = { onSeek(it.toLong()) },
+                                valueRange = 0f..(duration.toFloat().coerceAtLeast(1f)),
+                                colors = SliderDefaults.colors(
+                                    thumbColor = MaterialTheme.colorScheme.primary,
+                                    activeTrackColor = MaterialTheme.colorScheme.primary,
+                                    inactiveTrackColor = MaterialTheme.colorScheme.primaryContainer
+                                ),
+                                modifier = Modifier.fillMaxWidth()
                             )
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = formatTime(currentPosition),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    text = formatTime(duration),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                             
                             Spacer(modifier = Modifier.height(32.dp))
                             
@@ -286,4 +323,11 @@ fun ExpandingPlayer(
 
 private fun lerp(start: Float, stop: Float, fraction: Float): Float {
     return start + (stop - start) * fraction
+}
+
+private fun formatTime(ms: Long): String {
+    val totalSeconds = ms / 1000
+    val minutes = totalSeconds / 60
+    val seconds = totalSeconds % 60
+    return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
 }
