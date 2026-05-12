@@ -18,14 +18,33 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 
 enum class HomeTab {
     Songs, Albums, Artists, Folders
 }
 
+data class GroupedItem(
+    val name: String,
+    val songCount: Int,
+    val artworkUri: String? = null
+)
+
 class HomeScreenViewModel(private val repository: SongRepos) : ViewModel() {
-    private val _songs = MutableStateFlow<List<Song>>(emptyList())
-    val songs: StateFlow<List<Song>> = _songs.asStateFlow()
+    private val _allSongs = MutableStateFlow<List<Song>>(emptyList())
+    
+    private val _displaySongs = MutableStateFlow<List<Song>>(emptyList())
+    val songs: StateFlow<List<Song>> = _displaySongs.asStateFlow()
+
+    private val _groupedItems = MutableStateFlow<List<GroupedItem>>(emptyList())
+    val groupedItems: StateFlow<List<GroupedItem>> = _groupedItems.asStateFlow()
+
+    private val _selectedGroup = MutableStateFlow<String?>(null)
+    val selectedGroup: StateFlow<String?> = _selectedGroup.asStateFlow()
+
+    private val _alphabetMap = MutableStateFlow<Map<Char, Int>>(emptyMap())
+    val alphabetMap: StateFlow<Map<Char, Int>> = _alphabetMap.asStateFlow()
 
     private val _selectedTab = MutableStateFlow(HomeTab.Songs)
     val selectedTab: StateFlow<HomeTab> = _selectedTab.asStateFlow()
@@ -43,6 +62,7 @@ class HomeScreenViewModel(private val repository: SongRepos) : ViewModel() {
     val duration: StateFlow<Long> = _duration.asStateFlow()
 
     private var mediaController: MediaController? = null
+    private var progressJob: Job? = null
 
     init {
         refreshSongs()
@@ -61,7 +81,7 @@ class HomeScreenViewModel(private val repository: SongRepos) : ViewModel() {
                 }
 
                 override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-                    val currentSong = _songs.value.find { it.contentUri == mediaItem?.mediaId }
+                    val currentSong = _allSongs.value.find { it.contentUri == mediaItem?.mediaId }
                     if (currentSong != null) {
                         _selectedSong.value = currentSong
                     }
@@ -78,10 +98,11 @@ class HomeScreenViewModel(private val repository: SongRepos) : ViewModel() {
     }
 
     private fun startProgressUpdate() {
-        viewModelScope.launch {
+        progressJob?.cancel()
+        progressJob = viewModelScope.launch {
             while (_isPlaying.value) {
                 _currentPosition.value = mediaController?.currentPosition?.coerceAtLeast(0L) ?: 0L
-                kotlinx.coroutines.delay(500)
+                delay(500)
             }
         }
     }
@@ -94,22 +115,77 @@ class HomeScreenViewModel(private val repository: SongRepos) : ViewModel() {
     fun refreshSongs() {
         viewModelScope.launch {
             val allSongs = repository.fetchSongs()
-            _songs.value = sortSongs(allSongs, _selectedTab.value)
+            _allSongs.value = allSongs
+            updateDisplay()
         }
     }
 
     fun onTabSelected(tab: HomeTab) {
         _selectedTab.value = tab
-        _songs.value = sortSongs(_songs.value, tab)
+        _selectedGroup.value = null
+        updateDisplay()
     }
 
-    private fun sortSongs(songs: List<Song>, tab: HomeTab): List<Song> {
-        return when (tab) {
-            HomeTab.Songs -> songs.sortedBy { it.title.lowercase() }
-            HomeTab.Albums -> songs.sortedWith(compareBy({ it.album.lowercase() }, { it.title.lowercase() }))
-            HomeTab.Artists -> songs.sortedWith(compareBy({ it.artist.lowercase() }, { it.title.lowercase() }))
-            HomeTab.Folders -> songs.sortedBy { it.contentUri } // Fallback for folders
+    fun onGroupSelected(groupName: String) {
+        _selectedGroup.value = groupName
+        updateDisplay()
+    }
+
+    fun navigateBack() {
+        if (_selectedGroup.value != null) {
+            _selectedGroup.value = null
+            updateDisplay()
         }
+    }
+
+    private fun updateDisplay() {
+        val tab = _selectedTab.value
+        val group = _selectedGroup.value
+        val all = _allSongs.value
+
+        if (tab == HomeTab.Songs || group != null) {
+            val filtered = when {
+                group != null && tab == HomeTab.Artists -> all.filter { it.artist == group }
+                group != null && tab == HomeTab.Albums -> all.filter { it.album == group }
+                group != null && tab == HomeTab.Folders -> all.filter { it.folderName == group }
+                else -> all
+            }.sortedBy { it.title.lowercase() }
+            
+            _displaySongs.value = filtered
+            _groupedItems.value = emptyList()
+            updateAlphabetMap(filtered)
+        } else {
+            val grouped = when (tab) {
+                HomeTab.Artists -> all.groupBy { it.artist }.map { 
+                    GroupedItem(it.key, it.value.size, it.value.firstOrNull()?.albumArtUri) 
+                }
+                HomeTab.Albums -> all.groupBy { it.album }.map { 
+                    GroupedItem(it.key, it.value.size, it.value.firstOrNull()?.albumArtUri) 
+                }
+                HomeTab.Folders -> all.groupBy { it.folderName }.map { 
+                    GroupedItem(it.key, it.value.size, it.value.firstOrNull()?.albumArtUri) 
+                }
+                else -> emptyList()
+            }.sortedBy { it.name.lowercase() }
+
+            _groupedItems.value = grouped
+            _displaySongs.value = emptyList()
+            updateAlphabetMapForGroups(grouped)
+        }
+    }
+
+    private fun updateAlphabetMap(songs: List<Song>) {
+        _alphabetMap.value = songs.mapIndexed { index, song ->
+            val char = song.title.firstOrNull()?.uppercaseChar() ?: '#'
+            char to index
+        }.distinctBy { it.first }.toMap()
+    }
+
+    private fun updateAlphabetMapForGroups(groups: List<GroupedItem>) {
+        _alphabetMap.value = groups.mapIndexed { index, group ->
+            val char = group.name.firstOrNull()?.uppercaseChar() ?: '#'
+            char to index
+        }.distinctBy { it.first }.toMap()
     }
 
     fun onSongSelected(song: Song) {

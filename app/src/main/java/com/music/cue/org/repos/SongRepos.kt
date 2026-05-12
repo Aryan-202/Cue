@@ -5,6 +5,7 @@ import android.content.Context
 import android.provider.MediaStore
 import com.music.cue.org.data.Song
 import androidx.core.net.toUri
+import java.io.File
 
 class SongRepos(private val context: Context) {
     fun fetchSongs(): List<Song> {
@@ -16,7 +17,8 @@ class SongRepos(private val context: Context) {
             MediaStore.Audio.Media.ARTIST,
             MediaStore.Audio.Media.ALBUM,
             MediaStore.Audio.Media.DURATION,
-            MediaStore.Audio.Media.ALBUM_ID
+            MediaStore.Audio.Media.ALBUM_ID,
+            MediaStore.Audio.Media.DATA
         )
 
         context.contentResolver.query(
@@ -32,6 +34,7 @@ class SongRepos(private val context: Context) {
             val albumColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
             val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
             val albumIdColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
+            val dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
 
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
@@ -40,13 +43,17 @@ class SongRepos(private val context: Context) {
                 val album = cursor.getString(albumColumn)
                 val duration = cursor.getLong(durationColumn)
                 val albumId = cursor.getLong(albumIdColumn)
+                val data = cursor.getString(dataColumn)
+                
+                val folderName = File(data).parentFile?.name ?: "Unknown"
+                
                 val contentUri = ContentUris.withAppendedId(collection, id).toString()
                 val albumArtUri = ContentUris.withAppendedId(
                     "content://media/external/audio/albumart".toUri(),
                     albumId
                 ).toString()
 
-                songs.add(Song(id, title, artist, album, duration, contentUri, albumArtUri))
+                songs.add(Song(id, title, artist, album, duration, contentUri, albumArtUri, folderName))
             }
         }
         return songs
