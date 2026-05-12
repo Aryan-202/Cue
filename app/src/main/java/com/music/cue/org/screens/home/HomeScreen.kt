@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.music.cue.org.repos.SongRepos
+import com.music.cue.org.ui.components.NavigationBar
 import kotlinx.coroutines.launch
 
 @Composable
@@ -44,6 +45,7 @@ fun HomeScreen(
     onSongClick: () -> Unit = {}
 ) {
     val songs by viewModel.songs.collectAsState()
+    val selectedTab by viewModel.selectedTab.collectAsState()
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     var selectedLetter by remember { mutableStateOf<Char?>(null) }
@@ -76,55 +78,61 @@ fun HomeScreen(
     }
 
     Box(modifier = modifier.fillMaxSize()) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            state = listState
-        ) {
-            itemsIndexed(songs) { index, song ->
-                ListItem(
-                    headlineContent = {
-                        Text(
-                            text = song.title,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    },
-                    supportingContent = {
-                        Text(
-                            text = song.artist,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    },
-                    leadingContent = {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            NavigationBar(
+                selectedTab = selectedTab,
+                onTabSelected = { viewModel.onTabSelected(it) }
+            )
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                state = listState
+            ) {
+                itemsIndexed(songs) { index, song ->
+                    ListItem(
+                        headlineContent = {
                             Text(
-                                text = (index + 1).toString(),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.width(24.dp),
-                                textAlign = TextAlign.End
+                                text = song.title,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
-                            AsyncImage(
-                                model = song.albumArtUri,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .clip(RoundedCornerShape(8.dp)),
-                                contentScale = ContentScale.Crop,
-                                placeholder = rememberVectorPainter(Icons.Default.MusicNote),
-                                error = rememberVectorPainter(Icons.Default.MusicNote)
+                        },
+                        supportingContent = {
+                            Text(
+                                text = song.artist,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
+                        },
+                        leadingContent = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Text(
+                                    text = (index + 1).toString(),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.width(24.dp),
+                                    textAlign = TextAlign.End
+                                )
+                                AsyncImage(
+                                    model = song.albumArtUri,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .clip(RoundedCornerShape(8.dp)),
+                                    contentScale = ContentScale.Crop,
+                                    placeholder = rememberVectorPainter(Icons.Default.MusicNote),
+                                    error = rememberVectorPainter(Icons.Default.MusicNote)
+                                )
+                            }
+                        },
+                        modifier = Modifier.clickable {
+                            viewModel.onSongSelected(song)
+                            onSongClick()
                         }
-                    },
-                    modifier = Modifier.clickable {
-                        viewModel.onSongSelected(song)
-                        onSongClick()
-                    }
-                )
+                    )
+                }
             }
         }
 
@@ -133,7 +141,7 @@ fun HomeScreen(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .fillMaxHeight()
-                .padding(end = 4.dp, top = 16.dp, bottom = 16.dp)
+                .padding(end = 4.dp, top = 64.dp, bottom = 16.dp) // top padding to clear Nav Bar
                 .width(24.dp)
                 .onGloballyPositioned { columnHeight = it.size.height }
                 .pointerInput(Unit) {

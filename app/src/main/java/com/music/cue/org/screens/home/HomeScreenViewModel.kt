@@ -19,9 +19,16 @@ import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
 
+enum class HomeTab {
+    Songs, Albums, Artists, Folders
+}
+
 class HomeScreenViewModel(private val repository: SongRepos) : ViewModel() {
     private val _songs = MutableStateFlow<List<Song>>(emptyList())
     val songs: StateFlow<List<Song>> = _songs.asStateFlow()
+
+    private val _selectedTab = MutableStateFlow(HomeTab.Songs)
+    val selectedTab: StateFlow<HomeTab> = _selectedTab.asStateFlow()
 
     private val _selectedSong = MutableStateFlow<Song?>(null)
     val selectedSong: StateFlow<Song?> = _selectedSong.asStateFlow()
@@ -86,7 +93,22 @@ class HomeScreenViewModel(private val repository: SongRepos) : ViewModel() {
 
     fun refreshSongs() {
         viewModelScope.launch {
-            _songs.value = repository.fetchSongs().sortedBy { it.title.lowercase() }
+            val allSongs = repository.fetchSongs()
+            _songs.value = sortSongs(allSongs, _selectedTab.value)
+        }
+    }
+
+    fun onTabSelected(tab: HomeTab) {
+        _selectedTab.value = tab
+        _songs.value = sortSongs(_songs.value, tab)
+    }
+
+    private fun sortSongs(songs: List<Song>, tab: HomeTab): List<Song> {
+        return when (tab) {
+            HomeTab.Songs -> songs.sortedBy { it.title.lowercase() }
+            HomeTab.Albums -> songs.sortedWith(compareBy({ it.album.lowercase() }, { it.title.lowercase() }))
+            HomeTab.Artists -> songs.sortedWith(compareBy({ it.artist.lowercase() }, { it.title.lowercase() }))
+            HomeTab.Folders -> songs.sortedBy { it.contentUri } // Fallback for folders
         }
     }
 
