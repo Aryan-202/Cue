@@ -1,6 +1,9 @@
 package com.music.cue.org.screens.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -17,7 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -41,6 +46,7 @@ fun HomeScreen(
     val songs by viewModel.songs.collectAsState()
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+    var selectedLetter by remember { mutableStateOf<Char?>(null) }
 
     val alphabetMap = remember(songs) {
         songs.mapIndexed { index, song ->
@@ -50,6 +56,24 @@ fun HomeScreen(
     }
 
     val alphabet = remember { ('A'..'Z').toList() + '#' }
+    var columnHeight by remember { mutableIntStateOf(0) }
+
+    fun updateScroll(y: Float) {
+        if (columnHeight > 0) {
+            val index = (y / columnHeight * alphabet.size).toInt().coerceIn(0, alphabet.size - 1)
+            val char = alphabet[index]
+            if (selectedLetter != char) {
+                alphabetMap[char]?.let { songIndex ->
+                    coroutineScope.launch {
+                        selectedLetter = char
+                        listState.scrollToItem(songIndex)
+                    }
+                } ?: run {
+                    selectedLetter = char
+                }
+            }
+        }
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
@@ -110,7 +134,25 @@ fun HomeScreen(
                 .align(Alignment.CenterEnd)
                 .fillMaxHeight()
                 .padding(end = 4.dp, top = 16.dp, bottom = 16.dp)
-                .width(20.dp),
+                .width(24.dp)
+                .onGloballyPositioned { columnHeight = it.size.height }
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onPress = { offset ->
+                            updateScroll(offset.y)
+                            tryAwaitRelease()
+                            selectedLetter = null
+                        }
+                    )
+                }
+                .pointerInput(Unit) {
+                    detectDragGestures(
+                        onDragStart = { offset -> updateScroll(offset.y) },
+                        onDrag = { change, _ -> updateScroll(change.position.y) },
+                        onDragEnd = { selectedLetter = null },
+                        onDragCancel = { selectedLetter = null }
+                    )
+                },
             verticalArrangement = Arrangement.SpaceEvenly,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -119,19 +161,29 @@ fun HomeScreen(
                 Text(
                     text = char.toString(),
                     style = MaterialTheme.typography.labelSmall.copy(
-                        fontSize = 10.sp,
+                        fontSize = 11.sp,
                         fontWeight = if (hasSongs) FontWeight.Bold else FontWeight.Normal
                     ),
                     color = if (hasSongs) MaterialTheme.colorScheme.primary else Color.Gray.copy(alpha = 0.5f),
-                    modifier = Modifier
-                        .clickable(enabled = hasSongs) {
-                            alphabetMap[char]?.let { index ->
-                                coroutineScope.launch {
-                                    listState.animateScrollToItem(index)
-                                }
-                            }
-                        }
-                        .padding(vertical = 1.dp)
+                    modifier = Modifier.padding(vertical = 1.dp)
+                )
+            }
+        }
+
+        // Center Overlay for selected letter
+        selectedLetter?.let { letter ->
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .align(Alignment.Center)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.9f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = letter.toString(),
+                    style = MaterialTheme.typography.displayLarge,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
         }
