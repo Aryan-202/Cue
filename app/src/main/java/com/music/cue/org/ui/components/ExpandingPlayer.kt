@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.util.lerp
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -148,12 +149,15 @@ fun ExpandingPlayer(
                     HorizontalPager(
                         state = pagerState,
                         modifier = Modifier.fillMaxSize(),
-                        userScrollEnabled = !isExpanded, // Only swipe when collapsed
+                        userScrollEnabled = true,
                         beyondViewportPageCount = 1
                     ) { pageIndex ->
                         val currentSong = songs[pageIndex]
+                        val pageOffset = (pagerState.currentPage - pageIndex) + pagerState.currentPageOffsetFraction
+
                         PlayerPageContent(
                             song = currentSong,
+                            pageOffset = pageOffset,
                             fraction = fraction,
                             isPlaying = isPlaying && pageIndex == pagerState.currentPage,
                             currentPosition = currentPosition,

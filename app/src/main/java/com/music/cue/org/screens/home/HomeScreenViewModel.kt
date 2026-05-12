@@ -38,11 +38,23 @@ class HomeScreenViewModel(
 ) : ViewModel() {
     private val _allSongs = MutableStateFlow<List<Song>>(emptyList())
     
+    private val _songsTab = MutableStateFlow<List<Song>>(emptyList())
+    val songsTab: StateFlow<List<Song>> = _songsTab.asStateFlow()
+
+    private val _artistsTab = MutableStateFlow<List<GroupedItem>>(emptyList())
+    val artistsTab: StateFlow<List<GroupedItem>> = _artistsTab.asStateFlow()
+
+    private val _albumsTab = MutableStateFlow<List<GroupedItem>>(emptyList())
+    val albumsTab: StateFlow<List<GroupedItem>> = _albumsTab.asStateFlow()
+
+    private val _foldersTab = MutableStateFlow<List<GroupedItem>>(emptyList())
+    val foldersTab: StateFlow<List<GroupedItem>> = _foldersTab.asStateFlow()
+
     private val _displaySongs = MutableStateFlow<List<Song>>(emptyList())
     val songs: StateFlow<List<Song>> = _displaySongs.asStateFlow()
 
-    private val _groupedItems = MutableStateFlow<List<GroupedItem>>(emptyList())
-    val groupedItems: StateFlow<List<GroupedItem>> = _groupedItems.asStateFlow()
+    private val _playbackQueue = MutableStateFlow<List<Song>>(emptyList())
+    val playbackQueue: StateFlow<List<Song>> = _playbackQueue.asStateFlow()
 
     private val _selectedGroup = MutableStateFlow<String?>(null)
     val selectedGroup: StateFlow<String?> = _selectedGroup.asStateFlow()
@@ -135,12 +147,25 @@ class HomeScreenViewModel(
             val allSongs = repository.fetchSongs()
             _allSongs.value = allSongs
             
+            // Pre-calculate all tabs for smooth swiping
+            _songsTab.value = allSongs.sortedBy { it.title.lowercase() }
+            _artistsTab.value = allSongs.groupBy { it.artist }.map { 
+                GroupedItem(it.key, it.value.size, it.value.firstOrNull()?.albumArtUri) 
+            }.sortedBy { it.name.lowercase() }
+            _albumsTab.value = allSongs.groupBy { it.album }.map { 
+                GroupedItem(it.key, it.value.size, it.value.firstOrNull()?.albumArtUri) 
+            }.sortedBy { it.name.lowercase() }
+            _foldersTab.value = allSongs.groupBy { it.folderName }.map { 
+                GroupedItem(it.key, it.value.size, it.value.firstOrNull()?.albumArtUri) 
+            }.sortedBy { it.name.lowercase() }
+
             // Load last played song
             val lastId = userPrefs.getLastSongId()
             if (lastId != -1L && _selectedSong.value == null) {
                 val lastSong = allSongs.find { it.id == lastId }
                 if (lastSong != null) {
                     _selectedSong.value = lastSong
+                    _playbackQueue.value = _songsTab.value // Default queue to all songs
                     _duration.value = lastSong.durationMs
                     val lastPos = userPrefs.getLastPosition()
                     _currentPosition.value = lastPos
@@ -185,34 +210,38 @@ class HomeScreenViewModel(
         val group = _selectedGroup.value
         val all = _allSongs.value
 
-        if (tab == HomeTab.Songs || group != null) {
-            val filtered = when {
-                group != null && tab == HomeTab.Artists -> all.filter { it.artist == group }
-                group != null && tab == HomeTab.Albums -> all.filter { it.album == group }
-                group != null && tab == HomeTab.Folders -> all.filter { it.folderName == group }
+        if (group != null) {
+            // Only update _displaySongs when in a group (Album/Artist/Folder view)
+            val filtered = when (tab) {
+                HomeTab.Artists -> all.filter { it.artist == group }
+                HomeTab.Albums -> all.filter { it.album == group }
+                HomeTab.Folders -> all.filter { it.folderName == group }
                 else -> all
             }.sortedBy { it.title.lowercase() }
             
             _displaySongs.value = filtered
-            _groupedItems.value = emptyList()
             updateAlphabetMap(filtered)
         } else {
-            val grouped = when (tab) {
-                HomeTab.Artists -> all.groupBy { it.artist }.map { 
-                    GroupedItem(it.key, it.value.size, it.value.firstOrNull()?.albumArtUri) 
+            // When no group is selected, we use the pre-calculated tabs
+            // and update _displaySongs if we are on the Songs tab for the playlist
+            when (tab) {
+                HomeTab.Songs -> {
+                    _displaySongs.value = _songsTab.value
+                    updateAlphabetMap(_songsTab.value)
                 }
-                HomeTab.Albums -> all.groupBy { it.album }.map { 
-                    GroupedItem(it.key, it.value.size, it.value.firstOrNull()?.albumArtUri) 
+                HomeTab.Artists -> {
+                    _displaySongs.value = emptyList()
+                    updateAlphabetMapForGroups(_artistsTab.value)
                 }
-                HomeTab.Folders -> all.groupBy { it.folderName }.map { 
-                    GroupedItem(it.key, it.value.size, it.value.firstOrNull()?.albumArtUri) 
+                HomeTab.Albums -> {
+                    _displaySongs.value = emptyList()
+                    updateAlphabetMapForGroups(_albumsTab.value)
                 }
-                else -> emptyList()
-            }.sortedBy { it.name.lowercase() }
-
-            _groupedItems.value = grouped
-            _displaySongs.value = emptyList()
-            updateAlphabetMapForGroups(grouped)
+                HomeTab.Folders -> {
+                    _displaySongs.value = emptyList()
+                    updateAlphabetMapForGroups(_foldersTab.value)
+                }
+            }
         }
     }
 
@@ -233,14 +262,43 @@ class HomeScreenViewModel(
     fun onSongSelected(song: Song) {
         _selectedSong.value = song
         userPrefs.saveLastSongId(song.id)
+        
+        val currentQueue = _displaySongs.value
+        _playbackQueue.value = currentQueue
+
         mediaController?.let { controller ->
-            val mediaItem = MediaItem.Builder()
-                .setMediaId(song.contentUri)
-                .setUri(song.contentUri.toUri())
-                .build()
-            controller.setMediaItem(mediaItem)
-            controller.prepare()
-            controller.play()
+            val index = currentQueue.indexOfFirst { it.id == song.id }.coerceAtLeast(0)
+            
+            // Check if the current song is already the one selected to avoid redundant loading
+            val currentMediaId = controller.currentMediaItem?.mediaId
+            if (currentMediaId == song.contentUri) {
+                if (!controller.isPlaying) controller.play()
+                return
+            }
+
+            // Check if the song is already in the current playlist
+            var foundIndex = -1
+            for (i in 0 until controller.mediaItemCount) {
+                if (controller.getMediaItemAt(i).mediaId == song.contentUri) {
+                    foundIndex = i
+                    break
+                }
+            }
+
+            if (foundIndex != -1) {
+                controller.seekTo(foundIndex, 0L)
+                controller.play()
+            } else {
+                val mediaItems = currentQueue.map { s ->
+                    MediaItem.Builder()
+                        .setMediaId(s.contentUri)
+                        .setUri(s.contentUri.toUri())
+                        .build()
+                }
+                controller.setMediaItems(mediaItems, index, 0L)
+                controller.prepare()
+                controller.play()
+            }
         }
     }
 

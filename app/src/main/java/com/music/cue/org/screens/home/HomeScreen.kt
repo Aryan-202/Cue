@@ -8,7 +8,8 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -53,20 +54,46 @@ fun HomeScreen(
     onSongClick: () -> Unit = {}
 ) {
     val songs by viewModel.songs.collectAsState()
-    val groupedItems by viewModel.groupedItems.collectAsState()
+    val songsTab by viewModel.songsTab.collectAsState()
+    val artistsTab by viewModel.artistsTab.collectAsState()
+    val albumsTab by viewModel.albumsTab.collectAsState()
+    val foldersTab by viewModel.foldersTab.collectAsState()
+    
     val selectedGroup by viewModel.selectedGroup.collectAsState()
     val selectedTab by viewModel.selectedTab.collectAsState()
     val alphabetMap by viewModel.alphabetMap.collectAsState()
-    val listState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
     
-    val selectedLetterState = remember { mutableStateOf<Char?>(null) }
-    val alphabet = remember { ('A'..'Z').toList() + '#' }
-    var columnHeight by remember { mutableIntStateOf(0) }
+    val tabs = remember { HomeTab.entries }
+    val pagerState = rememberPagerState(initialPage = tabs.indexOf(selectedTab)) { tabs.size }
+    
+    // Maintain separate scroll states for each tab
+    val tabStates = remember { List(tabs.size) { androidx.compose.foundation.lazy.LazyListState() } }
+    val listState = tabStates[tabs.indexOf(selectedTab)]
+    val coroutineScope = rememberCoroutineScope()
+
+    // Sync Pager with selectedTab
+    LaunchedEffect(selectedTab) {
+        val index = tabs.indexOf(selectedTab)
+        if (index >= 0 && index != pagerState.currentPage) {
+            pagerState.animateScrollToPage(index)
+        }
+    }
+
+    // Sync selectedTab with Pager
+    LaunchedEffect(pagerState.currentPage) {
+        val tab = tabs[pagerState.currentPage]
+        if (tab != selectedTab) {
+            viewModel.onTabSelected(tab)
+        }
+    }
 
     BackHandler(enabled = selectedGroup != null) {
         viewModel.navigateBack()
     }
+
+    val selectedLetterState = remember { mutableStateOf<Char?>(null) }
+    val alphabet = remember { ('A'..'Z').toList() + '#' }
+    var columnHeight by remember { mutableIntStateOf(0) }
 
     val updateScroll: (Float) -> Unit = remember(columnHeight, alphabet, alphabetMap) {
         { y ->
@@ -90,7 +117,11 @@ fun HomeScreen(
             if (selectedGroup == null) {
                 NavigationBar(
                     selectedTab = selectedTab,
-                    onTabSelected = { viewModel.onTabSelected(it) }
+                    onTabSelected = { tab ->
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(tabs.indexOf(tab))
+                        }
+                    }
                 )
             } else {
                 Row(
@@ -112,28 +143,91 @@ fun HomeScreen(
                 }
             }
 
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                state = listState
-            ) {
-                if (selectedGroup == null && selectedTab != HomeTab.Songs) {
-                    itemsIndexed(
-                        items = groupedItems,
-                        key = { _, item -> item.name },
-                        contentType = { _, _ -> "group_item" }
-                    ) { index, item ->
-                        GroupListItem(
-                            index = index,
-                            item = item,
-                            tab = selectedTab,
-                            onClick = { viewModel.onGroupSelected(item.name) }
-                        )
+            if (selectedGroup == null) {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.weight(1f),
+                    beyondViewportPageCount = 1
+                ) { pageIndex ->
+                    val currentTab = tabs[pageIndex]
+                    // We only show the content if this tab is the "active" one in the VM 
+                    // to avoid loading data for all tabs at once if unnecessary, 
+                    // though here updateDisplay() handles it.
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        state = tabStates[pageIndex]
+                    ) {
+                        when (currentTab) {
+                            HomeTab.Songs -> {
+                                itemsIndexed(
+                                    items = songsTab,
+                                    key = { _, song -> song.id },
+                                    contentType = { _, _ -> "song_item" }
+                                ) { index, song ->
+                                    SongListItem(
+                                        index = index,
+                                        song = song,
+                                        onClick = {
+                                            viewModel.onSongSelected(song)
+                                            onSongClick()
+                                        }
+                                    )
+                                }
+                            }
+                            HomeTab.Artists -> {
+                                itemsIndexed(
+                                    items = artistsTab,
+                                    key = { _, item -> item.name },
+                                    contentType = { _, _ -> "group_item" }
+                                ) { index, item ->
+                                    GroupListItem(
+                                        index = index,
+                                        item = item,
+                                        tab = currentTab,
+                                        onClick = { viewModel.onGroupSelected(item.name) }
+                                    )
+                                }
+                            }
+                            HomeTab.Albums -> {
+                                itemsIndexed(
+                                    items = albumsTab,
+                                    key = { _, item -> item.name },
+                                    contentType = { _, _ -> "group_item" }
+                                ) { index, item ->
+                                    GroupListItem(
+                                        index = index,
+                                        item = item,
+                                        tab = currentTab,
+                                        onClick = { viewModel.onGroupSelected(item.name) }
+                                    )
+                                }
+                            }
+                            HomeTab.Folders -> {
+                                itemsIndexed(
+                                    items = foldersTab,
+                                    key = { _, item -> item.name },
+                                    contentType = { _, _ -> "group_item" }
+                                ) { index, item ->
+                                    GroupListItem(
+                                        index = index,
+                                        item = item,
+                                        tab = currentTab,
+                                        onClick = { viewModel.onGroupSelected(item.name) }
+                                    )
+                                }
+                            }
+                        }
                     }
-                } else {
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    state = listState
+                ) {
                     itemsIndexed(
                         items = songs,
                         key = { _, song -> song.id },
-                        contentType = { _, _ -> "song_item" } 
+                        contentType = { _, _ -> "song_item" }
                     ) { index, song ->
                         SongListItem(
                             index = index,

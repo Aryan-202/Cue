@@ -4,10 +4,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material3.*
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
-import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +27,7 @@ import kotlin.math.roundToInt
 @Composable
 fun PlayerPageContent(
     song: Song,
+    pageOffset: Float,
     fraction: Float,
     isPlaying: Boolean,
     currentPosition: Long,
@@ -65,7 +66,7 @@ fun PlayerPageContent(
             contentScale = ContentScale.Crop
         )
 
-        // Mini Controls
+        // Mini Controls (Slide with Pager)
         if (fraction < 0.8f) {
             Row(
                 modifier = Modifier
@@ -91,12 +92,19 @@ fun PlayerPageContent(
             }
         }
 
-        // Full Controls
+        // Full Controls (Pinned in Player Screen)
         if (fraction > 0.2f) {
+            val offScreenFraction = if (pageOffset < 0) -pageOffset else pageOffset
+            val controlsAlpha = (1f - offScreenFraction.coerceIn(0f, 1f))
+            
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .graphicsLayer { alpha = ((fraction - 0.2f) / 0.8f).coerceIn(0f, 1f) }
+                    .graphicsLayer { 
+                        // Counteract the slide ONLY for full controls in player screen
+                        translationX = pageOffset * size.width
+                        alpha = ((fraction - 0.2f) / 0.8f).coerceIn(0f, 1f) * controlsAlpha
+                    }
                     .padding(top = 100.dp + baseImageSize + 32.dp, start = 24.dp, end = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
