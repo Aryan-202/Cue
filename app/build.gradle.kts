@@ -23,7 +23,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -42,7 +43,6 @@ android {
 dependencies {
 
     implementation(libs.androidx.core.splashscreen)
-    implementation(libs.androidx.hilt.navigation.fragment)
     implementation(libs.lottie.compose)
 
     implementation(libs.androidx.core.ktx)

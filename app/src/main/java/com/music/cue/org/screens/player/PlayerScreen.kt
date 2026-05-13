@@ -2,7 +2,6 @@ package com.music.cue.org.screens.player
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,7 +42,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.music.cue.org.data.Song
-import com.music.cue.org.ui.components.CustomLinearProgressIndicator
+import com.music.cue.org.ui.components.ModernSeekBar
 import com.music.cue.org.ui.components.MarqueeText
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -116,7 +115,7 @@ fun PlayerScreen(
                 modifier = Modifier
                     .size(300.dp)
                     .padding(16.dp)
-                    .clip(RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(24.dp))
                     .background(MaterialTheme.colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
             ) {
@@ -137,23 +136,41 @@ fun PlayerScreen(
                 }
             }
 
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                // Custom Progress Indicator
-                CustomLinearProgressIndicator(
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Modern Seek Bar
+                ModernSeekBar(
                     progress = if (duration > 0) currentPosition.toFloat() / duration.toFloat() else 0f,
-                    modifier = Modifier
-                        .padding(horizontal = 24.dp)
-                        .fillMaxWidth()
-                        .height(12.dp)
-                        .pointerInput(duration) {
-                            detectTapGestures { offset ->
-                                if (duration > 0) {
-                                    val newProgress = offset.x / size.width
-                                    onSeek((newProgress * duration).toLong())
-                                }
-                            }
+                    onProgressChange = { newProgress ->
+                        if (duration > 0) {
+                            onSeek((newProgress * duration).toLong())
                         }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    trackHeight = 16.dp
                 )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = formatTime(currentPosition),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = formatTime(duration),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -187,4 +204,11 @@ fun PlayerScreen(
             }
         }
     }
+}
+
+private fun formatTime(ms: Long): String {
+    val totalSeconds = (ms / 1000).coerceAtLeast(0)
+    val minutes = totalSeconds / 60
+    val seconds = totalSeconds % 60
+    return "${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
 }
