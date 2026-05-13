@@ -45,6 +45,9 @@ fun HomeScreen(
     val selectedTab by viewModel.selectedTab.collectAsState()
     val alphabetMap by viewModel.alphabetMap.collectAsState()
     
+    val selectedSong by viewModel.selectedSong.collectAsState()
+    val isPlaying by viewModel.isPlaying.collectAsState()
+    
     val tabs = remember { HomeTab.entries }
     val pagerState = rememberPagerState(initialPage = tabs.indexOf(selectedTab)) { tabs.size }
     
@@ -132,6 +135,7 @@ fun HomeScreen(
                                     SongListItem(
                                         index = index,
                                         song = song,
+                                        isPlaying = song.id == selectedSong?.id && isPlaying,
                                         onClick = {
                                             viewModel.onSongSelected(song)
                                             onSongClick()
@@ -182,6 +186,7 @@ fun HomeScreen(
                         SongListItem(
                             index = index,
                             song = song,
+                            isPlaying = song.id == selectedSong?.id && isPlaying,
                             onClick = {
                                 viewModel.onSongSelected(song)
                                 onSongClick()
