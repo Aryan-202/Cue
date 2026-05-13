@@ -21,6 +21,8 @@ import kotlinx.coroutines.launch
 import androidx.core.net.toUri
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 enum class HomeTab {
     Songs, Albums, Artists, Folders
@@ -144,20 +146,29 @@ class HomeScreenViewModel(
 
     fun refreshSongs() {
         viewModelScope.launch {
-            val allSongs = repository.fetchSongs()
+            val allSongs = withContext(Dispatchers.IO) {
+                repository.fetchSongs()
+            }
             _allSongs.value = allSongs
             
-            // Pre-calculate all tabs for smooth swiping
-            _songsTab.value = allSongs.sortedBy { it.title.lowercase() }
-            _artistsTab.value = allSongs.groupBy { it.artist }.map { 
-                GroupedItem(it.key, it.value.size, it.value.firstOrNull()?.albumArtUri) 
-            }.sortedBy { it.name.lowercase() }
-            _albumsTab.value = allSongs.groupBy { it.album }.map { 
-                GroupedItem(it.key, it.value.size, it.value.firstOrNull()?.albumArtUri) 
-            }.sortedBy { it.name.lowercase() }
-            _foldersTab.value = allSongs.groupBy { it.folderName }.map { 
-                GroupedItem(it.key, it.value.size, it.value.firstOrNull()?.albumArtUri) 
-            }.sortedBy { it.name.lowercase() }
+            // Pre-calculate all tabs on a background thread
+            withContext(Dispatchers.Default) {
+                val songsSorted = allSongs.sortedBy { it.title.lowercase() }
+                val artists = allSongs.groupBy { it.artist }.map { 
+                    GroupedItem(it.key, it.value.size, it.value.firstOrNull()?.albumArtUri) 
+                }.sortedBy { it.name.lowercase() }
+                val albums = allSongs.groupBy { it.album }.map { 
+                    GroupedItem(it.key, it.value.size, it.value.firstOrNull()?.albumArtUri) 
+                }.sortedBy { it.name.lowercase() }
+                val folders = allSongs.groupBy { it.folderName }.map { 
+                    GroupedItem(it.key, it.value.size, it.value.firstOrNull()?.albumArtUri) 
+                }.sortedBy { it.name.lowercase() }
+
+                _songsTab.value = songsSorted
+                _artistsTab.value = artists
+                _albumsTab.value = albums
+                _foldersTab.value = folders
+            }
 
             // Load last played song
             val lastId = userPrefs.getLastSongId()
@@ -210,53 +221,58 @@ class HomeScreenViewModel(
         val group = _selectedGroup.value
         val all = _allSongs.value
 
-        if (group != null) {
-            // Only update _displaySongs when in a group (Album/Artist/Folder view)
-            val filtered = when (tab) {
-                HomeTab.Artists -> all.filter { it.artist == group }
-                HomeTab.Albums -> all.filter { it.album == group }
-                HomeTab.Folders -> all.filter { it.folderName == group }
-                else -> all
-            }.sortedBy { it.title.lowercase() }
-            
-            _displaySongs.value = filtered
-            updateAlphabetMap(filtered)
-        } else {
-            // When no group is selected, we use the pre-calculated tabs
-            // and update _displaySongs if we are on the Songs tab for the playlist
-            when (tab) {
-                HomeTab.Songs -> {
+        viewModelScope.launch {
+            if (group != null) {
+                val filtered = withContext(Dispatchers.Default) {
+                    when (tab) {
+                        HomeTab.Artists -> all.filter { it.artist == group }
+                        HomeTab.Albums -> all.filter { it.album == group }
+                        HomeTab.Folders -> all.filter { it.folderName == group }
+                        else -> all
+                    }.sortedBy { it.title.lowercase() }
+                }
+                
+                _displaySongs.value = filtered
+                updateAlphabetMap(filtered)
+            } else {
+                when (tab) {
+                    HomeTab.Songs -> updateAlphabetMap(_songsTab.value)
+                    HomeTab.Artists -> updateAlphabetMapForGroups(_artistsTab.value)
+                    HomeTab.Albums -> updateAlphabetMapForGroups(_albumsTab.value)
+                    HomeTab.Folders -> updateAlphabetMapForGroups(_foldersTab.value)
+                }
+                
+                if (tab == HomeTab.Songs) {
                     _displaySongs.value = _songsTab.value
-                    updateAlphabetMap(_songsTab.value)
-                }
-                HomeTab.Artists -> {
+                } else {
                     _displaySongs.value = emptyList()
-                    updateAlphabetMapForGroups(_artistsTab.value)
-                }
-                HomeTab.Albums -> {
-                    _displaySongs.value = emptyList()
-                    updateAlphabetMapForGroups(_albumsTab.value)
-                }
-                HomeTab.Folders -> {
-                    _displaySongs.value = emptyList()
-                    updateAlphabetMapForGroups(_foldersTab.value)
                 }
             }
         }
     }
 
     private fun updateAlphabetMap(songs: List<Song>) {
-        _alphabetMap.value = songs.mapIndexed { index, song ->
-            val char = song.title.firstOrNull()?.uppercaseChar() ?: '#'
-            char to index
-        }.distinctBy { it.first }.toMap()
+        viewModelScope.launch {
+            val map = withContext(Dispatchers.Default) {
+                songs.mapIndexed { index, song ->
+                    val char = song.title.firstOrNull()?.uppercaseChar() ?: '#'
+                    char to index
+                }.distinctBy { it.first }.toMap()
+            }
+            _alphabetMap.value = map
+        }
     }
 
     private fun updateAlphabetMapForGroups(groups: List<GroupedItem>) {
-        _alphabetMap.value = groups.mapIndexed { index, group ->
-            val char = group.name.firstOrNull()?.uppercaseChar() ?: '#'
-            char to index
-        }.distinctBy { it.first }.toMap()
+        viewModelScope.launch {
+            val map = withContext(Dispatchers.Default) {
+                groups.mapIndexed { index, group ->
+                    val char = group.name.firstOrNull()?.uppercaseChar() ?: '#'
+                    char to index
+                }.distinctBy { it.first }.toMap()
+            }
+            _alphabetMap.value = map
+        }
     }
 
     fun onSongSelected(song: Song) {
