@@ -43,10 +43,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.music.cue.org.data.Song
-import com.music.cue.org.ui.components.CustomLinearProgressIndicator
 import com.music.cue.org.ui.components.MarqueeText
+import com.music.cue.org.ui.components.formatTime
 
 import com.music.cue.org.ui.theme.CueIcons
+import dev.vivvvek.seeker.Seeker
+import dev.vivvvek.seeker.SeekerDefaults
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -139,23 +141,42 @@ fun PlayerScreen(
                 }
             }
 
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                // Custom Progress Indicator
-                CustomLinearProgressIndicator(
-                    progress = if (duration > 0) currentPosition.toFloat() / duration.toFloat() else 0f,
-                    modifier = Modifier
-                        .padding(horizontal = 24.dp)
-                        .fillMaxWidth()
-                        .height(12.dp)
-                        .pointerInput(duration) {
-                            detectTapGestures { offset ->
-                                if (duration > 0) {
-                                    val newProgress = offset.x / size.width
-                                    onSeek((newProgress * duration).toLong())
-                                }
-                            }
-                        }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Seeker Seek Bar
+                Seeker(
+                    value = if (duration > 0) currentPosition.toFloat() else 0f,
+                    range = 0f..(duration.toFloat().coerceAtLeast(1f)),
+                    onValueChange = { onSeek(it.toLong()) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = SeekerDefaults.seekerColors(
+                        progressColor = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.primaryContainer,
+                        thumbColor = MaterialTheme.colorScheme.primary
+                    )
                 )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = formatTime(currentPosition),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = formatTime(duration),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 

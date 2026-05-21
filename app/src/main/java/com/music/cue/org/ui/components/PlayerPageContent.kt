@@ -19,6 +19,8 @@ import coil.request.ImageRequest
 import coil.size.Size
 import com.music.cue.org.data.Song
 import com.music.cue.org.ui.theme.CueIcons
+import dev.vivvvek.seeker.Seeker
+import dev.vivvvek.seeker.SeekerDefaults
 import kotlin.math.roundToInt
 
 @Composable
@@ -110,16 +112,16 @@ fun PlayerPageContent(
                 
                 Spacer(modifier = Modifier.height(48.dp))
 
-                Slider(
+                Seeker(
                     value = if (duration > 0) currentPosition.toFloat() else 0f,
+                    range = 0f..(duration.toFloat().coerceAtLeast(1f)),
                     onValueChange = { onSeek(it.toLong()) },
-                    valueRange = 0f..(duration.toFloat().coerceAtLeast(1f)),
-                    colors = SliderDefaults.colors(
-                        thumbColor = MaterialTheme.colorScheme.primary,
-                        activeTrackColor = MaterialTheme.colorScheme.primary,
-                        inactiveTrackColor = MaterialTheme.colorScheme.primaryContainer
-                    ),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = SeekerDefaults.seekerColors(
+                        progressColor = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.primaryContainer,
+                        thumbColor = MaterialTheme.colorScheme.primary
+                    )
                 )
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
