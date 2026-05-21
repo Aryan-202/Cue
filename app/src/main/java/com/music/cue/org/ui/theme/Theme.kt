@@ -66,13 +66,6 @@ fun CueTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            
-            // Only set status bar color on versions below API 35 (Android 15)
-            // On API 35+, it's forced to be transparent and this method is deprecated
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-                window.statusBarColor = colorScheme.primary.toArgb()
-            }
-
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }

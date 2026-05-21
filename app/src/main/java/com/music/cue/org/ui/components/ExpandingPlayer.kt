@@ -19,17 +19,18 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.music.cue.org.data.Song
+import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
-
-import com.music.cue.org.ui.theme.CueIcons
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,8 +94,12 @@ fun ExpandingPlayer(
         }
     }
 
-    val currentOffset = offset.value
-    val fraction = if (swipeLimit > 0) (1f - (currentOffset / swipeLimit)).coerceIn(0f, 1f) else 1f
+    // Use derivedStateOf for values that change rapidly to avoid unnecessary recompositions
+    val fractionState = remember(swipeLimit) {
+        derivedStateOf {
+            if (swipeLimit > 0) (1f - (offset.value / swipeLimit)).coerceIn(0f, 1f) else 1f
+        }
+    }
 
     BackHandler(enabled = isExpanded) {
         isExpanded = false
@@ -113,12 +118,50 @@ fun ExpandingPlayer(
             }
     ) {
         if (containerHeightPx > 0) {
-            Surface(
+            val collapsedColor = MaterialTheme.colorScheme.primaryContainer
+            val expandedColor = MaterialTheme.colorScheme.surface
+            
+            // Use Box instead of Surface to avoid recompositions when fraction changes
+            Box(
                 modifier = Modifier
-                    .graphicsLayer { translationY = currentOffset }
-                    .fillMaxWidth()
-                    .padding(horizontal = lerp(16f, 0f, fraction).dp)
-                    .height(with(density) { lerp(collapsedHeightPx, containerHeightPx, fraction).toDp() })
+                    .align(Alignment.TopCenter)
+                    .graphicsLayer { 
+                        translationY = offset.value 
+                        val f = fractionState.value
+                        
+                        // Apply shape and shadow via graphicsLayer to avoid recomposition
+                        clip = true
+                        shape = RoundedCornerShape(lerp(12f, 0f, f).dp)
+                        shadowElevation = with(density) { 8.dp.toPx() }
+                    }
+                    // Animate background color smoothly in the draw phase
+                    .drawBehind {
+                        val f = fractionState.value
+                        // Premium smooth color interpolation
+                        val color = Color(
+                            red = lerp(collapsedColor.red, expandedColor.red, f),
+                            green = lerp(collapsedColor.green, expandedColor.green, f),
+                            blue = lerp(collapsedColor.blue, expandedColor.blue, f),
+                            alpha = lerp(collapsedColor.alpha, expandedColor.alpha, f)
+                        )
+                        drawRect(color)
+                    }
+                    // Optimize height and width using Modifier.layout
+                    .layout { measurable, constraints ->
+                        val f = fractionState.value
+                        val sideMargin = lerp(16f, 0f, f).dp.roundToPx()
+                        val w = (constraints.maxWidth - 2 * sideMargin).coerceAtLeast(0)
+                        val h = lerp(collapsedHeightPx, containerHeightPx, f).roundToInt()
+                        
+                        val placeable = measurable.measure(
+                            androidx.compose.ui.unit.Constraints.fixed(w, h)
+                        )
+                        
+                        // Layout with the actual width to ensure side gaps
+                        layout(w, h) {
+                            placeable.place(0, 0)
+                        }
+                    }
                     .draggable(
                         orientation = Orientation.Vertical,
                         state = rememberDraggableState { delta ->
@@ -142,10 +185,7 @@ fun ExpandingPlayer(
                         coroutineScope.launch {
                             offset.animateTo(if (isExpanded) 0f else swipeLimit, spring(stiffness = Spring.StiffnessMediumLow))
                         }
-                    },
-                shape = RoundedCornerShape(lerp(12f, 0f, fraction).dp),
-                color = if (fraction < 0.1f) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
-                tonalElevation = 8.dp
+                    }
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     HorizontalPager(
@@ -155,12 +195,16 @@ fun ExpandingPlayer(
                         beyondViewportPageCount = 1
                     ) { pageIndex ->
                         val currentSong = songs[pageIndex]
-                        val pageOffset = (pagerState.currentPage - pageIndex) + pagerState.currentPageOffsetFraction
+                        
+                        // Optimize: pageOffset as a lambda to avoid recomposing all pages during swipe
+                        val pageOffsetLambda = remember(pagerState, pageIndex) {
+                            { (pagerState.currentPage - pageIndex) + pagerState.currentPageOffsetFraction }
+                        }
 
                         PlayerPageContent(
                             song = currentSong,
-                            pageOffset = pageOffset,
-                            fraction = fraction,
+                            pageOffset = pageOffsetLambda,
+                            fraction = { fractionState.value },
                             isPlaying = isPlaying && pageIndex == pagerState.currentPage,
                             currentPosition = currentPosition,
                             duration = duration,
@@ -174,7 +218,10 @@ fun ExpandingPlayer(
                     }
 
                     // Top Bar (Static, doesn't swipe)
-                    if (fraction > 0.2f) {
+                    val topBarAlpha by remember {
+                        derivedStateOf { ((fractionState.value - 0.5f) / 0.5f).coerceIn(0f, 1f) }
+                    }
+                    if (fractionState.value > 0.2f) {
                         TopAppBar(
                             title = { Text("Now Playing", style = MaterialTheme.typography.titleMedium) },
                             navigationIcon = {
@@ -186,12 +233,12 @@ fun ExpandingPlayer(
                                 }
                             },
                             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
-                            modifier = Modifier.graphicsLayer { alpha = ((fraction - 0.5f) / 0.5f).coerceIn(0f, 1f) }
+                            modifier = Modifier.graphicsLayer { alpha = topBarAlpha }
                         )
                     }
                     
                     // Bottom progress (collapsed, static)
-                    if (fraction < 0.05f) {
+                    if (fractionState.value < 0.05f) {
                         CustomLinearProgressIndicator(
                             progress = if (duration > 0) currentPosition.toFloat() / duration else 0f,
                             modifier = Modifier

@@ -84,14 +84,15 @@ fun HomeScreen(
     // Optimization: Use current list state for scrolling
     val currentListState = tabStates[pagerState.currentPage]
 
-    val updateScroll: (Float) -> Unit = remember(columnHeight, alphabet, alphabetMap, currentListState) {
+    val updateScroll: (Float) -> Unit = remember(columnHeight, alphabet, currentListState) {
         { y ->
             if (columnHeight > 0) {
                 val index = (y / columnHeight * alphabet.size).toInt().coerceIn(0, alphabet.size - 1)
                 val char = alphabet[index]
                 if (selectedLetterState.value != char) {
                     selectedLetterState.value = char
-                    alphabetMap[char]?.let { targetIndex ->
+                    // Read alphabetMap from viewModel directly in the lambda to avoid re-remembering the lambda
+                    viewModel.alphabetMap.value[char]?.let { targetIndex ->
                         coroutineScope.launch {
                             currentListState.scrollToItem(targetIndex)
                         }

@@ -12,19 +12,23 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.music.cue.org.screens.home.GroupedItem
 import com.music.cue.org.screens.home.HomeTab
 
 @Composable
 fun GroupListItem(index: Int, item: GroupedItem, tab: HomeTab, onClick: () -> Unit) {
+    val context = LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -56,8 +60,15 @@ fun GroupListItem(index: Int, item: GroupedItem, tab: HomeTab, onClick: () -> Un
             contentAlignment = Alignment.Center
         ) {
             if (item.artworkUri != null && tab == HomeTab.Albums) {
+                val imageRequest = remember(item.artworkUri) {
+                    ImageRequest.Builder(context)
+                        .data(item.artworkUri)
+                        .crossfade(true)
+                        .size(128, 128)
+                        .build()
+                }
                 AsyncImage(
-                    model = item.artworkUri,
+                    model = imageRequest,
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop

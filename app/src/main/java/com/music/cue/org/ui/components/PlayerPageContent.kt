@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import coil.size.Size
 import com.music.cue.org.data.Song
 import com.music.cue.org.ui.theme.CueIcons
 import dev.vivvvek.seeker.Seeker
@@ -26,8 +25,8 @@ import kotlin.math.roundToInt
 @Composable
 fun PlayerPageContent(
     song: Song,
-    pageOffset: Float,
-    fraction: Float,
+    pageOffset: () -> Float,
+    fraction: () -> Float,
     isPlaying: Boolean,
     currentPosition: Long,
     duration: Long,
@@ -48,103 +47,122 @@ fun PlayerPageContent(
         val fullX = with(density) { ((configuration.screenWidthDp.dp / 2) - (baseImageSize / 2)).toPx() }
         val fullY = with(density) { 100.dp.toPx() }
 
-        val currentImageX = lerp(miniX, fullX, fraction)
-        val currentImageY = lerp(miniY, fullY, fraction)
-
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(song.albumArtUri)
                 .crossfade(enable = true)
-                .size(Size.ORIGINAL)
+                .size(512, 512)
                 .build(),
             contentDescription = null,
             modifier = Modifier
-                .offset { IntOffset(currentImageX.roundToInt(), currentImageY.roundToInt()) }
-                .size(lerp(miniImageSize.value, baseImageSize.value, fraction).dp)
-                .clip(RoundedCornerShape(lerp(8f, 16f, fraction).dp)),
+                .offset { 
+                    val f = fraction()
+                    IntOffset(
+                        lerp(miniX, fullX, f).roundToInt(),
+                        lerp(miniY, fullY, f).roundToInt()
+                    )
+                }
+                .graphicsLayer {
+                    val f = fraction()
+                    val targetScale = baseImageSize.value / miniImageSize.value
+                    val scale = lerp(1f, targetScale, f)
+                    scaleX = scale
+                    scaleY = scale
+                    transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0f, 0f)
+                    
+                    // GPU-accelerated clip and shape
+                    clip = true
+                    val targetRadius = 16f / targetScale
+                    shape = RoundedCornerShape(lerp(8f, targetRadius, f).dp)
+                }
+                .size(miniImageSize),
             contentScale = ContentScale.Crop
         )
 
-        // Mini Controls (Slide with Pager)
-        if (fraction < 0.8f) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(64.dp)
-                    .graphicsLayer { alpha = (1f - (fraction / 0.8f)).coerceIn(0f, 1f) }
-                    .padding(start = 64.dp, end = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    MarqueeText(text = song.title, style = MaterialTheme.typography.bodyLarge)
-                    Text(text = song.artist, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        // Mini Controls (Slide with Pager) - Kept in UI tree but invisible when expanded
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(64.dp)
+                .graphicsLayer { 
+                    val f = fraction()
+                    alpha = (1f - (f / 0.7f)).coerceIn(0f, 1f)
+                    // Move it slightly down or off-screen to avoid intercepting clicks when not visible
+                    translationY = if (f > 0.8f) 10000f else 0f 
                 }
-                IconButton(onClick = onPrevious) {
-                    Icon(CueIcons.SkipPrevious, null)
-                }
-                IconButton(onClick = onTogglePlay) {
-                    Icon(painter = if (isPlaying) CueIcons.PauseCircle else CueIcons.PlayCircle, contentDescription = null, modifier = Modifier.size(32.dp))
-                }
-                IconButton(onClick = onNext) {
-                    Icon(CueIcons.SkipNext, null)
-                }
+                .padding(start = 64.dp, end = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                MarqueeText(text = song.title, style = MaterialTheme.typography.bodyLarge)
+                Text(text = song.artist, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+            IconButton(onClick = onPrevious) {
+                Icon(CueIcons.SkipPrevious, null)
+            }
+            IconButton(onClick = onTogglePlay) {
+                Icon(painter = if (isPlaying) CueIcons.PauseCircle else CueIcons.PlayCircle, contentDescription = null, modifier = Modifier.size(32.dp))
+            }
+            IconButton(onClick = onNext) {
+                Icon(CueIcons.SkipNext, null)
             }
         }
 
         // Full Controls (Pinned in Player Screen)
-        if (fraction > 0.2f) {
-            val offScreenFraction = if (pageOffset < 0) -pageOffset else pageOffset
-            val controlsAlpha = (1f - offScreenFraction.coerceIn(0f, 1f))
-            
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer { 
-                        // Counteract the slide ONLY for full controls in player screen
-                        translationX = pageOffset * size.width
-                        alpha = ((fraction - 0.2f) / 0.8f).coerceIn(0f, 1f) * controlsAlpha
-                    }
-                    .padding(top = 100.dp + baseImageSize + 32.dp, start = 24.dp, end = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                MarqueeText(text = song.title, style = MaterialTheme.typography.headlineMedium)
-                Text(text = song.artist, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                
-                Spacer(modifier = Modifier.height(48.dp))
-
-                Seeker(
-                    value = if (duration > 0) currentPosition.toFloat() else 0f,
-                    range = 0f..(duration.toFloat().coerceAtLeast(1f)),
-                    onValueChange = { onSeek(it.toLong()) },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = SeekerDefaults.seekerColors(
-                        progressColor = MaterialTheme.colorScheme.primary,
-                        trackColor = MaterialTheme.colorScheme.primaryContainer,
-                        thumbColor = MaterialTheme.colorScheme.primary
-                    )
-                )
-
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(text = formatTime(currentPosition), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(text = formatTime(duration), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer { 
+                    val f = fraction()
+                    val pOffset = pageOffset()
+                    val offScreenFraction = if (pOffset < 0) -pOffset else pOffset
+                    val controlsAlpha = (1f - offScreenFraction.coerceIn(0f, 1f))
+                    
+                    translationX = pOffset * size.width
+                    alpha = ((f - 0.3f) / 0.7f).coerceIn(0f, 1f) * controlsAlpha
+                    // Hide when minimized to prevent overlap and touch issues
+                    translationY = if (f < 0.2f) 10000f else 0f
                 }
-                
-                Spacer(modifier = Modifier.height(32.dp))
-                
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onPrevious, modifier = Modifier.size(64.dp)) {
-                        Icon(CueIcons.SkipPrevious, null, modifier = Modifier.size(40.dp))
-                    }
-                    FilledIconButton(onClick = onTogglePlay, modifier = Modifier.size(80.dp)) {
-                        Icon(painter = if (isPlaying) CueIcons.PauseCircle else CueIcons.PlayCircle, contentDescription = null, modifier = Modifier.size(48.dp))
-                    }
-                    IconButton(onClick = onNext, modifier = Modifier.size(64.dp)) {
-                        Icon(CueIcons.SkipNext, null, modifier = Modifier.size(40.dp))
-                    }
+                .padding(top = 100.dp + baseImageSize + 32.dp, start = 24.dp, end = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            MarqueeText(text = song.title, style = MaterialTheme.typography.headlineMedium)
+            Text(text = song.artist, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            
+            Spacer(modifier = Modifier.height(48.dp))
+
+            Seeker(
+                value = if (duration > 0) currentPosition.toFloat() else 0f,
+                range = 0f..(duration.toFloat().coerceAtLeast(1f)),
+                onValueChange = { onSeek(it.toLong()) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = SeekerDefaults.seekerColors(
+                    progressColor = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.primaryContainer,
+                    thumbColor = MaterialTheme.colorScheme.primary
+                )
+            )
+
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(text = formatTime(currentPosition), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = formatTime(duration), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onPrevious, modifier = Modifier.size(64.dp)) {
+                    Icon(CueIcons.SkipPrevious, null, modifier = Modifier.size(40.dp))
+                }
+                FilledIconButton(onClick = onTogglePlay, modifier = Modifier.size(80.dp)) {
+                    Icon(painter = if (isPlaying) CueIcons.PauseCircle else CueIcons.PlayCircle, contentDescription = null, modifier = Modifier.size(48.dp))
+                }
+                IconButton(onClick = onNext, modifier = Modifier.size(64.dp)) {
+                    Icon(CueIcons.SkipNext, null, modifier = Modifier.size(40.dp))
                 }
             }
         }

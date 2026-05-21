@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,18 +48,25 @@ fun SongListItem(
         
         Spacer(modifier = Modifier.width(12.dp))
 
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
+        val context = LocalContext.current
+        val musicIcon = rememberVectorPainter(Icons.Default.MusicNote)
+        val imageRequest = remember(song.albumArtUri) {
+            ImageRequest.Builder(context)
                 .data(song.albumArtUri)
                 .crossfade(true)
-                .build(),
+                .size(128, 128) // Small size for list items
+                .build()
+        }
+
+        AsyncImage(
+            model = imageRequest,
             contentDescription = null,
             modifier = Modifier
                 .size(48.dp)
                 .clip(RoundedCornerShape(8.dp)),
             contentScale = ContentScale.Crop,
-            placeholder = rememberVectorPainter(Icons.Default.MusicNote),
-            error = rememberVectorPainter(Icons.Default.MusicNote)
+            placeholder = musicIcon,
+            error = musicIcon
         )
 
         Spacer(modifier = Modifier.width(12.dp))
