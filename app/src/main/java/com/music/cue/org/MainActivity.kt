@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
@@ -21,6 +24,7 @@ import com.music.cue.org.repos.SongRepos
 import com.music.cue.org.screens.home.HomeScreen
 import com.music.cue.org.screens.home.HomeScreenViewModel
 import com.music.cue.org.screens.home.HomeScreenViewModelFactory
+import com.music.cue.org.screens.splash.SplashScreen
 import com.music.cue.org.screens.splash.SplashScreenViewModel
 import com.music.cue.org.ui.components.ExpandingPlayer
 import com.music.cue.org.ui.theme.CueTheme
@@ -34,7 +38,6 @@ class MainActivity : ComponentActivity() {
         val userPrefs = UserPrefs(this)
         HomeScreenViewModelFactory(SongRepos(this), userPrefs)
     }
-    
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen().setKeepOnScreenCondition {
@@ -59,47 +62,56 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             CueTheme {
-                val navController = rememberNavController()
-                val playbackQueue by homeScreenViewModel.playbackQueue.collectAsState()
-                val selectedSong by homeScreenViewModel.selectedSong.collectAsState()
-                val isPlaying by homeScreenViewModel.isPlaying.collectAsState()
-                val currentPosition by homeScreenViewModel.currentPosition.collectAsState()
-                val duration by homeScreenViewModel.duration.collectAsState()
+                // Only show the custom splash animation on cold start (when savedInstanceState is null)
+                var showSplashScreen by remember { mutableStateOf(savedInstanceState == null) }
 
-                Box(modifier = Modifier.fillMaxSize()) {
-                    Scaffold(
-                        modifier = Modifier.fillMaxSize()
-                    ) { innerPadding ->
-                        NavHost(
-                            navController = navController,
-                            startDestination = "home",
-                            modifier = Modifier.padding(innerPadding)
-                        ) {
-                            composable("home") {
-                                HomeScreen(
-                                    viewModel = homeScreenViewModel,
-                                    onSongClick = {
-                                        // No-op, expansion is handled by ExpandingPlayer
-                                    }
-                                )
+                if (showSplashScreen) {
+                    SplashScreen(onAnimationFinished = {
+                        showSplashScreen = false
+                    })
+                } else {
+                    val navController = rememberNavController()
+                    val playbackQueue by homeScreenViewModel.playbackQueue.collectAsState()
+                    val selectedSong by homeScreenViewModel.selectedSong.collectAsState()
+                    val isPlaying by homeScreenViewModel.isPlaying.collectAsState()
+                    val currentPosition by homeScreenViewModel.currentPosition.collectAsState()
+                    val duration by homeScreenViewModel.duration.collectAsState()
+
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Scaffold(
+                            modifier = Modifier.fillMaxSize()
+                        ) { innerPadding ->
+                            NavHost(
+                                navController = navController,
+                                startDestination = "home",
+                                modifier = Modifier.padding(innerPadding)
+                            ) {
+                                composable("home") {
+                                    HomeScreen(
+                                        viewModel = homeScreenViewModel,
+                                        onSongClick = {
+                                            // No-op, expansion is handled by ExpandingPlayer
+                                        }
+                                    )
+                                }
                             }
                         }
-                    }
 
-                    // The expanding player sits on top of everything
-                    if (selectedSong != null) {
-                        ExpandingPlayer(
-                            song = selectedSong,
-                            songs = playbackQueue,
-                            isPlaying = isPlaying,
-                            currentPosition = currentPosition,
-                            duration = duration,
-                            onTogglePlay = { homeScreenViewModel.togglePlayPause() },
-                            onNext = { homeScreenViewModel.next() },
-                            onPrevious = { homeScreenViewModel.previous() },
-                            onSeek = { homeScreenViewModel.seekTo(it) },
-                            onSongSelected = { homeScreenViewModel.onSongSelected(it) }
-                        )
+                        // The expanding player sits on top of everything
+                        if (selectedSong != null) {
+                            ExpandingPlayer(
+                                song = selectedSong,
+                                songs = playbackQueue,
+                                isPlaying = isPlaying,
+                                currentPosition = currentPosition,
+                                duration = duration,
+                                onTogglePlay = { homeScreenViewModel.togglePlayPause() },
+                                onNext = { homeScreenViewModel.next() },
+                                onPrevious = { homeScreenViewModel.previous() },
+                                onSeek = { homeScreenViewModel.seekTo(it) },
+                                onSongSelected = { homeScreenViewModel.onSongSelected(it) }
+                            )
+                        }
                     }
                 }
             }

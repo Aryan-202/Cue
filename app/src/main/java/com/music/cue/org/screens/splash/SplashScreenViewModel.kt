@@ -2,7 +2,6 @@ package com.music.cue.org.screens.splash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -13,7 +12,7 @@ class SplashScreenViewModel: ViewModel() {
 
     init {
         viewModelScope.launch {
-            delay(1000)
+            // Remove the delay so the system splash screen hands over to the custom animation immediately
             _isSplashScreenVisible.value = false
         }
     }
