@@ -33,6 +33,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.ui.graphics.ColorFilter
+import com.music.cue.org.ui.theme.CueIcons
+
 @Composable
 fun SplashScreen(onAnimationFinished: () -> Unit) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.recording))
@@ -40,13 +44,24 @@ fun SplashScreen(onAnimationFinished: () -> Unit) {
     val iconOffset = remember { Animatable(0f) }
     val lottieOffset = remember { Animatable(0f) }
     val lottieAlpha = remember { Animatable(0f) }
-    // Start at 1f (fully visible) to seamlessly transition from the system splash screen
     val iconScale = remember { Animatable(1f) }
 
+    val isDark = isSystemInDarkTheme()
+    
+    // Dynamic background based on theme
+    val backgroundColor = if (isDark) {
+        Brush.verticalGradient(listOf(Color(0xFF000000), Color(0xFF121212)))
+    } else {
+        Brush.verticalGradient(
+            listOf(
+                Color(0xFFD1E4FF), // Matching splash_background_color
+                Color(0xFFFFFFFF)
+            )
+        )
+    }
+
     LaunchedEffect(Unit) {
-        // Start the split animation almost immediately after taking over from the system
         delay(300) 
-        
         launch {
             iconOffset.animateTo(
                 targetValue = -80f,
@@ -60,36 +75,26 @@ fun SplashScreen(onAnimationFinished: () -> Unit) {
                 animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
             )
         }
-        
-        delay(2000) // Watch the animation for a bit
+        delay(2000)
         onAnimationFinished()
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF1A237E), // Deep Blue
-                        Color(0xFF0D47A1), // Blue
-                        Color(0xFF01579B)  // Light Blue
-                    )
-                )
-            ),
+            .background(backgroundColor),
         contentAlignment = Alignment.Center
     ) {
-        // App Icon - Matches the system splash screen icon for a seamless transition
         Image(
-            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+            painter = CueIcons.AppIcon,
             contentDescription = null,
             modifier = Modifier
                 .size(100.dp)
                 .offset(x = iconOffset.value.dp)
-                .alpha(iconScale.value)
+                .alpha(iconScale.value),
+            colorFilter = ColorFilter.tint(if (isDark) Color.White else Color(0xFF1C274C))
         )
         
-        // Lottie Animation
         Box(
             modifier = Modifier
                 .size(150.dp)

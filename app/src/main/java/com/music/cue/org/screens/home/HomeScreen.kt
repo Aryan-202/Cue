@@ -26,6 +26,8 @@ import com.music.cue.org.ui.components.NavigationBar
 import com.music.cue.org.utils.UserPrefs
 import kotlinx.coroutines.launch
 
+import com.music.cue.org.ui.theme.CueIcons
+
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -218,7 +220,7 @@ private fun Header(title: String, onBack: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = onBack) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+            Icon(CueIcons.ArrowBack, contentDescription = "Back")
         }
         Text(
             text = title,

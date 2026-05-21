@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import com.music.cue.org.data.Song
 import kotlinx.coroutines.launch
 
+import com.music.cue.org.ui.theme.CueIcons
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExpandingPlayer(

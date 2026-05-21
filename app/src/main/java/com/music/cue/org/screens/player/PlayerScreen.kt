@@ -46,6 +46,8 @@ import com.music.cue.org.data.Song
 import com.music.cue.org.ui.components.CustomLinearProgressIndicator
 import com.music.cue.org.ui.components.MarqueeText
 
+import com.music.cue.org.ui.theme.CueIcons
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerScreen(
@@ -84,7 +86,7 @@ fun PlayerScreen(
                 title = { Text("Now Playing") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(CueIcons.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
@@ -129,7 +131,7 @@ fun PlayerScreen(
                     )
                 } else {
                     Icon(
-                        imageVector = Icons.Default.MusicNote,
+                        imageVector = CueIcons.MusicNote,
                         contentDescription = null,
                         modifier = Modifier.size(100.dp),
                         tint = MaterialTheme.colorScheme.onPrimaryContainer
@@ -164,21 +166,21 @@ fun PlayerScreen(
                 ) {
                     IconButton(onClick = onPrevious) {
                         Icon(
-                            Icons.Default.FastRewind,
+                            imageVector = CueIcons.FastRewind,
                             contentDescription = "Previous",
                             modifier = Modifier.size(48.dp)
                         )
                     }
                     FilledIconButton(onClick = onTogglePlay, modifier = Modifier.size(72.dp)) {
                         Icon(
-                            if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                            painter = if (isPlaying) CueIcons.PauseCircle else CueIcons.PlayCircle,
                             contentDescription = if (isPlaying) "Pause" else "Play",
                             modifier = Modifier.size(40.dp)
                         )
                     }
                     IconButton(onClick = onNext) {
                         Icon(
-                            Icons.Default.FastForward,
+                            imageVector = CueIcons.FastForward,
                             contentDescription = "Next",
                             modifier = Modifier.size(48.dp)
                         )

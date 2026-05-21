@@ -2,12 +2,7 @@ package com.music.cue.org.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material3.*
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.SkipNext
-import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,10 +13,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Size
 import com.music.cue.org.data.Song
+import com.music.cue.org.ui.theme.CueIcons
 import kotlin.math.roundToInt
 
 @Composable
@@ -81,13 +78,13 @@ fun PlayerPageContent(
                     Text(text = song.artist, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
                 IconButton(onClick = onPrevious) {
-                    Icon(Icons.Default.SkipPrevious, null)
+                    Icon(CueIcons.SkipPrevious, null)
                 }
                 IconButton(onClick = onTogglePlay) {
-                    Icon(if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow, null)
+                    Icon(painter = if (isPlaying) CueIcons.PauseCircle else CueIcons.PlayCircle, contentDescription = null, modifier = Modifier.size(32.dp))
                 }
                 IconButton(onClick = onNext) {
-                    Icon(Icons.Default.SkipNext, null)
+                    Icon(CueIcons.SkipNext, null)
                 }
             }
         }
@@ -138,13 +135,13 @@ fun PlayerPageContent(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = onPrevious, modifier = Modifier.size(64.dp)) {
-                        Icon(Icons.Default.SkipPrevious, null, modifier = Modifier.size(40.dp))
+                        Icon(CueIcons.SkipPrevious, null, modifier = Modifier.size(40.dp))
                     }
                     FilledIconButton(onClick = onTogglePlay, modifier = Modifier.size(80.dp)) {
-                        Icon(if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow, null, modifier = Modifier.size(48.dp))
+                        Icon(painter = if (isPlaying) CueIcons.PauseCircle else CueIcons.PlayCircle, contentDescription = null, modifier = Modifier.size(48.dp))
                     }
                     IconButton(onClick = onNext, modifier = Modifier.size(64.dp)) {
-                        Icon(Icons.Default.SkipNext, null, modifier = Modifier.size(40.dp))
+                        Icon(CueIcons.SkipNext, null, modifier = Modifier.size(40.dp))
                     }
                 }
             }
