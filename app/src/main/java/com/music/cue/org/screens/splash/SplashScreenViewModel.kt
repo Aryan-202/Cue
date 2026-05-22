@@ -12,7 +12,6 @@ class SplashScreenViewModel: ViewModel() {
 
     init {
         viewModelScope.launch {
-            // Remove the delay so the system splash screen hands over to the custom animation immediately
             _isSplashScreenVisible.value = false
         }
     }

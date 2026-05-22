@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -27,12 +26,6 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.music.cue.org.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
-import androidx.compose.foundation.border
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.graphics.ColorFilter
 import com.music.cue.org.ui.theme.CueIcons
