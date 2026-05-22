@@ -1,17 +1,69 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+# Gradle files
+.gradle/
+build/
+app/release/
 
-.idea
+# IntelliJ IDEA / Android Studio
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Local configuration files (contains local paths, secrets, etc)
+local.properties
+google-services.json
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+.idea/deploymentTargetDropDown.xml
+
+# Keystore files
+*.jks
+*.keystore
+*.jceks
+*.p12
+
+# External Native Build
+.externalNativeBuild/
+.cxx/
+*.swp
+*.swo
+
+# Log files
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Android Studio captures
+captures/
+
+# Others
+.navigation/
+
+# Kotlin
+.kotlin/
+
+# Global build artifacts
+*.apk
+*.ap_
+
+# Unit test reports
+**/build/reports/
+**/build/test-results/
+
+# Linting
+**/build/outputs/lint-results*
+
+# Android App Bundle
+*.aab
+**/build/outputs/bundle/
+**/build/outputs/apk/
+
+# Documentation
+**/build/docs/
