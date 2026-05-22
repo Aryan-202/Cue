@@ -2,6 +2,7 @@ package com.music.cue.org.screens.home
 
 import android.content.ComponentName
 import android.content.Context
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -28,6 +29,7 @@ enum class HomeTab {
     Songs, Albums, Artists, Folders
 }
 
+@Immutable
 data class GroupedItem(
     val name: String,
     val songCount: Int,
@@ -114,7 +116,6 @@ class HomeScreenViewModel(
                 }
             })
 
-            // Restore playback state if a song was loaded from prefs
             _selectedSong.value?.let { song ->
                 val mediaItem = MediaItem.Builder()
                     .setMediaId(song.contentUri)
@@ -150,8 +151,7 @@ class HomeScreenViewModel(
                 repository.fetchSongs()
             }
             _allSongs.value = allSongs
-            
-            // Pre-calculate all tabs on a background thread
+
             withContext(Dispatchers.Default) {
                 val songsSorted = allSongs.sortedBy { it.title.lowercase() }
                 val artists = allSongs.groupBy { it.artist }.map { 
@@ -170,25 +170,26 @@ class HomeScreenViewModel(
                 _foldersTab.value = folders
             }
 
-            // Load last played song
             val lastId = userPrefs.getLastSongId()
             if (lastId != -1L && _selectedSong.value == null) {
                 val lastSong = allSongs.find { it.id == lastId }
                 if (lastSong != null) {
                     _selectedSong.value = lastSong
-                    _playbackQueue.value = _songsTab.value // Default queue to all songs
+                    _playbackQueue.value = _songsTab.value
                     _duration.value = lastSong.durationMs
                     val lastPos = userPrefs.getLastPosition()
                     _currentPosition.value = lastPos
-                    
-                    // Pre-load on controller if already initialized
-                    mediaController?.let { controller ->
-                        val mediaItem = MediaItem.Builder()
-                            .setMediaId(lastSong.contentUri)
-                            .setUri(lastSong.contentUri.toUri())
+
+                    val mediaItems = _songsTab.value.map { s ->
+                        MediaItem.Builder()
+                            .setMediaId(s.contentUri)
+                            .setUri(s.contentUri.toUri())
                             .build()
-                        controller.setMediaItem(mediaItem)
-                        controller.seekTo(lastPos)
+                    }
+                    val startIndex = _songsTab.value.indexOfFirst { it.id == lastSong.id }.coerceAtLeast(0)
+
+                    mediaController?.let { controller ->
+                        controller.setMediaItems(mediaItems, startIndex, lastPos)
                         controller.prepare()
                     }
                 }

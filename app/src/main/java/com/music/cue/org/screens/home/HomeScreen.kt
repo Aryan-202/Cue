@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,6 +25,10 @@ import com.music.cue.org.ui.components.NavigationBar
 import com.music.cue.org.utils.UserPrefs
 import kotlinx.coroutines.launch
 
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import com.music.cue.org.ui.theme.CueIcons
 
 @Composable
@@ -91,7 +94,6 @@ fun HomeScreen(
                 val char = alphabet[index]
                 if (selectedLetterState.value != char) {
                     selectedLetterState.value = char
-                    // Read alphabetMap from viewModel directly in the lambda to avoid re-remembering the lambda
                     viewModel.alphabetMap.value[char]?.let { targetIndex ->
                         coroutineScope.launch {
                             currentListState.scrollToItem(targetIndex)
@@ -101,6 +103,11 @@ fun HomeScreen(
             }
         }
     }
+
+    // Hoist Painters to avoid per-item recreation
+    val musicIconPainter = rememberVectorPainter(Icons.Default.MusicNote)
+    val personIconPainter = rememberVectorPainter(Icons.Default.Person)
+    val folderIconPainter = rememberVectorPainter(Icons.Default.Folder)
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -139,6 +146,7 @@ fun HomeScreen(
                                         index = index,
                                         song = song,
                                         isPlaying = song.id == selectedSong?.id && isPlaying,
+                                        musicIconPainter = musicIconPainter,
                                         onClick = {
                                             viewModel.onSongSelected(song)
                                             onSongClick()
@@ -152,7 +160,15 @@ fun HomeScreen(
                                     key = { _, item -> item.name },
                                     contentType = { _, _ -> "group_item" }
                                 ) { index, item ->
-                                    GroupListItem(index, item, currentTab) { viewModel.onGroupSelected(item.name) }
+                                    GroupListItem(
+                                        index = index,
+                                        item = item,
+                                        tab = currentTab,
+                                        personIconPainter = personIconPainter,
+                                        folderIconPainter = folderIconPainter,
+                                        musicIconPainter = musicIconPainter,
+                                        onClick = { viewModel.onGroupSelected(item.name) }
+                                    )
                                 }
                             }
                             HomeTab.Albums -> {
@@ -161,7 +177,15 @@ fun HomeScreen(
                                     key = { _, item -> item.name },
                                     contentType = { _, _ -> "group_item" }
                                 ) { index, item ->
-                                    GroupListItem(index, item, currentTab) { viewModel.onGroupSelected(item.name) }
+                                    GroupListItem(
+                                        index = index,
+                                        item = item,
+                                        tab = currentTab,
+                                        personIconPainter = personIconPainter,
+                                        folderIconPainter = folderIconPainter,
+                                        musicIconPainter = musicIconPainter,
+                                        onClick = { viewModel.onGroupSelected(item.name) }
+                                    )
                                 }
                             }
                             HomeTab.Folders -> {
@@ -170,7 +194,15 @@ fun HomeScreen(
                                     key = { _, item -> item.name },
                                     contentType = { _, _ -> "group_item" }
                                 ) { index, item ->
-                                    GroupListItem(index, item, currentTab) { viewModel.onGroupSelected(item.name) }
+                                    GroupListItem(
+                                        index = index,
+                                        item = item,
+                                        tab = currentTab,
+                                        personIconPainter = personIconPainter,
+                                        folderIconPainter = folderIconPainter,
+                                        musicIconPainter = musicIconPainter,
+                                        onClick = { viewModel.onGroupSelected(item.name) }
+                                    )
                                 }
                             }
                         }
@@ -190,6 +222,7 @@ fun HomeScreen(
                             index = index,
                             song = song,
                             isPlaying = song.id == selectedSong?.id && isPlaying,
+                            musicIconPainter = musicIconPainter,
                             onClick = {
                                 viewModel.onSongSelected(song)
                                 onSongClick()

@@ -4,10 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -16,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
@@ -27,7 +24,15 @@ import com.music.cue.org.screens.home.GroupedItem
 import com.music.cue.org.screens.home.HomeTab
 
 @Composable
-fun GroupListItem(index: Int, item: GroupedItem, tab: HomeTab, onClick: () -> Unit) {
+fun GroupListItem(
+    index: Int,
+    item: GroupedItem,
+    tab: HomeTab,
+    personIconPainter: Painter,
+    folderIconPainter: Painter,
+    musicIconPainter: Painter,
+    onClick: () -> Unit
+) {
     val context = LocalContext.current
     Row(
         modifier = Modifier
@@ -46,10 +51,10 @@ fun GroupListItem(index: Int, item: GroupedItem, tab: HomeTab, onClick: () -> Un
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        val icon = when (tab) {
-            HomeTab.Artists -> Icons.Default.Person
-            HomeTab.Folders -> Icons.Default.Folder
-            else -> Icons.Default.MusicNote
+        val iconPainter = when (tab) {
+            HomeTab.Artists -> personIconPainter
+            HomeTab.Folders -> folderIconPainter
+            else -> musicIconPainter
         }
         
         Box(
@@ -75,7 +80,7 @@ fun GroupListItem(index: Int, item: GroupedItem, tab: HomeTab, onClick: () -> Un
                 )
             } else {
                 Icon(
-                    imageVector = icon,
+                    painter = iconPainter,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary
                 )

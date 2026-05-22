@@ -6,7 +6,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -79,7 +78,7 @@ fun PlayerPageContent(
             contentScale = ContentScale.Crop
         )
 
-        // Mini Controls (Slide with Pager) - Kept in UI tree but invisible when expanded
+        // Mini Controls (Slide with Pager)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -87,7 +86,6 @@ fun PlayerPageContent(
                 .graphicsLayer { 
                     val f = fraction()
                     alpha = (1f - (f / 0.7f)).coerceIn(0f, 1f)
-                    // Move it slightly down or off-screen to avoid intercepting clicks when not visible
                     translationY = if (f > 0.8f) 10000f else 0f 
                 }
                 .padding(start = 64.dp, end = 4.dp),
@@ -98,13 +96,18 @@ fun PlayerPageContent(
                 Text(text = song.artist, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             IconButton(onClick = onPrevious) {
-                Icon(CueIcons.SkipPrevious, null)
+                Icon(CueIcons.SkipPrevious, null, tint = LocalContentColor.current)
             }
             IconButton(onClick = onTogglePlay) {
-                Icon(painter = if (isPlaying) CueIcons.PauseCircle else CueIcons.PlayCircle, contentDescription = null, modifier = Modifier.size(32.dp))
+                Icon(
+                    painter = if (isPlaying) CueIcons.PauseCircle else CueIcons.PlayCircle,
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp),
+                    tint = LocalContentColor.current
+                )
             }
             IconButton(onClick = onNext) {
-                Icon(CueIcons.SkipNext, null)
+                Icon(CueIcons.SkipNext, null, tint = LocalContentColor.current)
             }
         }
 
@@ -120,14 +123,13 @@ fun PlayerPageContent(
                     
                     translationX = pOffset * size.width
                     alpha = ((f - 0.3f) / 0.7f).coerceIn(0f, 1f) * controlsAlpha
-                    // Hide when minimized to prevent overlap and touch issues
                     translationY = if (f < 0.2f) 10000f else 0f
                 }
                 .padding(top = 100.dp + baseImageSize + 32.dp, start = 24.dp, end = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             MarqueeText(text = song.title, style = MaterialTheme.typography.headlineMedium)
-            Text(text = song.artist, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(text = song.artist, style = MaterialTheme.typography.bodyLarge, color = LocalContentColor.current.copy(alpha = 0.7f))
             
             Spacer(modifier = Modifier.height(48.dp))
 
@@ -144,8 +146,8 @@ fun PlayerPageContent(
             )
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(text = formatTime(currentPosition), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(text = formatTime(duration), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = formatTime(currentPosition), style = MaterialTheme.typography.labelMedium, color = LocalContentColor.current.copy(alpha = 0.7f))
+                Text(text = formatTime(duration), style = MaterialTheme.typography.labelMedium, color = LocalContentColor.current.copy(alpha = 0.7f))
             }
             
             Spacer(modifier = Modifier.height(32.dp))
@@ -156,13 +158,18 @@ fun PlayerPageContent(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onPrevious, modifier = Modifier.size(64.dp)) {
-                    Icon(CueIcons.SkipPrevious, null, modifier = Modifier.size(40.dp))
+                    Icon(CueIcons.SkipPrevious, null, modifier = Modifier.size(40.dp), tint = LocalContentColor.current)
                 }
                 FilledIconButton(onClick = onTogglePlay, modifier = Modifier.size(80.dp)) {
-                    Icon(painter = if (isPlaying) CueIcons.PauseCircle else CueIcons.PlayCircle, contentDescription = null, modifier = Modifier.size(48.dp))
+                    Icon(
+                        painter = if (isPlaying) CueIcons.PauseCircle else CueIcons.PlayCircle,
+                        contentDescription = null,
+                        modifier = Modifier.size(48.dp),
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
                 }
                 IconButton(onClick = onNext, modifier = Modifier.size(64.dp)) {
-                    Icon(CueIcons.SkipNext, null, modifier = Modifier.size(40.dp))
+                    Icon(CueIcons.SkipNext, null, modifier = Modifier.size(40.dp), tint = LocalContentColor.current)
                 }
             }
         }
