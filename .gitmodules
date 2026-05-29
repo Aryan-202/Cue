@@ -1,0 +1,3 @@
+[submodule "cue-secret-sauce"]
+	path = cue-secret-sauce
+	url = https://github.com/Aryan-202/cue-secret-sauce.git
